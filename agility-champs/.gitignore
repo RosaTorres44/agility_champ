@@ -1,33 +1,23 @@
-# Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Logs
 logs/
 *.log
-
-# Editor de texto
 .vscode/
 .idea/
 *.swp
-
-# Sistema operativo
 .DS_Store
 Thumbs.db
-
-# Build
 .next/
 out/
-
-# Entornos
 .env
 .env.local
 .env.*.local
-
-# Otros
 coverage/
+.next/cache/webpack/client-development/2.pack.gz
+agility-champs/.next/cache/webpack/client-development/index.pack.gz
+agility-champs/.next/cache/webpack/client-development/index.pack.gz.old
 
 
 
