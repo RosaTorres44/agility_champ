@@ -28,3 +28,4 @@ out/
 
 # Otros
 coverage/
+node_modules/
