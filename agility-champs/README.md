@@ -17,5 +17,6 @@ git add .
 git commit -m "Primera versión del proyecto"
 
 git branch -M v1.0
+git pull -u origin v1.0
 git push -u origin v1.0
 
