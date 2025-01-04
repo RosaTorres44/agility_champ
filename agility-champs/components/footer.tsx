@@ -6,11 +6,11 @@ export function Footer() {
     <footer className="bg-gray-900 text-gray-100">
       <div className="max-w-7xl mx-auto py-12 px-6">
         <div className="text-center mb-8">
-          <h3 className="text-xl font-semibold mb-4">Subscribe to our newsletter</h3>
+          <h3 className="text-xl font-semibold mb-4">Subscribete y enterate de las novedades</h3>
           <div className="flex gap-2 max-w-md mx-auto">
             <Input
               type="email"
-              placeholder="Input your email"
+              placeholder="Ingresa tu correo"
               className="bg-gray-800 border-gray-700"
             />
             <Button className="bg-indigo-600 hover:bg-indigo-700">
