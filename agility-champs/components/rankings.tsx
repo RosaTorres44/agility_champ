@@ -1,17 +1,25 @@
-
-import { Filtros  } from './filtros';
-import { TablaRankingOri  } from './tablaranking';
-
+"use client";
+import { Filtros } from './filtros';
+import { TablaRankingOri } from './tablaranking';
+import { useState } from 'react';
 
 export function Rankings() {
+  const [gradoFilter, setGradoFilter] = useState<string | null>(null);
+  const [categoriaFilter, setCategoriaFilter] = useState<string | null>(null);
+
   return (
     <section className="py-12 px-6 sm:px-12">
       <h2 className="text-2xl font-bold text-center">Rankings</h2>
       <p className="text-center text-muted-foreground mt-2">
         Revisa los rankings de la última competencia
       </p>
-      <Filtros /> 
-      <TablaRankingOri /> 
+      <Filtros 
+        gradoFilter={gradoFilter} 
+        setGradoFilter={setGradoFilter} 
+        categoriaFilter={categoriaFilter} 
+        setCategoriaFilter={setCategoriaFilter} 
+      />
+      <TablaRankingOri gradoFilter={gradoFilter} categoriaFilter={categoriaFilter} />
     </section>
   );
 }
