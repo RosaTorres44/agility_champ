@@ -19,4 +19,3 @@ git commit -m "Primera versión del proyecto"
 git branch -M start
 git pull origin start
 git push origin start
-
