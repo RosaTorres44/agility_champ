@@ -3,6 +3,8 @@ import { rankings } from '@/data/rankingData.js';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import dynamic from 'next/dynamic';
+ 
 
 interface TablaRankingProps {
   gradoFilter: string | null;
@@ -38,12 +40,15 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
               <td className="p-4">{ranking.grado}</td>
               <td className="p-4">{ranking.categoria}</td>
               <td className="p-4">
-                <div className="flex">
-                  {Array(ranking.rating).fill(0).map((_, i) => (
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: ranking?.rating || 0 }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
               </td>
+
+
+
               <td className="p-4">
                 <Image
                   src={ranking.image}
