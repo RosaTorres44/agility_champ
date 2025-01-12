@@ -1,14 +1,17 @@
 -- Modelo de Base de Datos para Gestión de Competencias
 
 DROP TABLE IF EXISTS Usuarios;
-CREATE TABLE Usuarios (
-    UsuarioID INT PRIMARY KEY AUTO_INCREMENT,
-    Nombre VARCHAR(100) NOT NULL,
-    CorreoElectronico VARCHAR(255) UNIQUE NOT NULL,
-    ContraseñaHash VARCHAR(255) NOT NULL,
-    Rol ENUM('Usuario', 'Juez') NOT NULL,
-    FechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE `Usuarios` (
+  `UsuarioID` int NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(100) NOT NULL,
+  `CorreoElectronico` varchar(255) NOT NULL,
+  `ContraseñaHash` varchar(255) NOT NULL,
+  `Rol` enum('Usuario','Juez') NOT NULL,
+  `FechaCreacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `FLG_ACTIVO` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`UsuarioID`),
+  UNIQUE KEY `CorreoElectronico` (`CorreoElectronico`)
+)  
 
 -- Tabla de Escuelas
 DROP TABLE IF EXISTS Escuelas;

@@ -1,5 +1,10 @@
 {
   "/page": "app/page.js",
   "/performance/page": "app/performance/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/api/usuarios/route": "app/api/usuarios/route.js",
+  "/api/categorias/route": "app/api/categorias/route.js",
+  "/api/rankings/route": "app/api/rankings/route.js",
+  "/api/grados/route": "app/api/grados/route.js",
+  "/api/competencias/route": "app/api/competencias/route.js"
 }

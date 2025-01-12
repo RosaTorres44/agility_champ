@@ -1,6 +1,5 @@
 "use client"; // Esto fuerza que el componente sea renderizado en el cliente
 
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -57,7 +56,7 @@ export function Nav() {
               <Link
                 href="/admin"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === '/performance' ? 'text-indigo-600' : 'text-gray-500'
+                  pathname === '/admin' ? 'text-indigo-600' : 'text-gray-500'
                 }`}
               >
                 Administrar
