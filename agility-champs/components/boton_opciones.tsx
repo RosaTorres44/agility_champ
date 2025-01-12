@@ -59,11 +59,11 @@ const [categorias, setCategorias] = useState<string[]>([]);
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="bg-white hover:bg-gray-50">
-          {selectedOption || "Todos las Categorias"}
+          {selectedOption || "Todas las Cagegorias"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedOption("Todos las Cagegorias")}>Todos las Categorias</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setSelectedOption("Todas las Cagegorias")}>Todas las Cagegorias</DropdownMenuItem>
         {categorias.map((categoria) => (
           <DropdownMenuItem key={categoria} onClick={() => setSelectedOption(categoria)}>
             {categoria}

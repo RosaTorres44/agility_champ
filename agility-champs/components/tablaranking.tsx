@@ -1,10 +1,9 @@
 "use client";
-import { rankings } from '@/data/rankingData.js';
-import Image from 'next/image';
-import { Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import dynamic from 'next/dynamic';
- 
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TablaRankingProps {
   gradoFilter: string | null;
@@ -12,11 +11,60 @@ interface TablaRankingProps {
 }
 
 export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingProps) {
-  const filteredRankings = rankings.filter((ranking) => {
-    const matchesGrado = gradoFilter === null || gradoFilter === "Todos los Grados" || ranking.grado === gradoFilter;
-    const matchesCategoria = categoriaFilter === null || categoriaFilter === "Todas las Categorias" || ranking.categoria === categoriaFilter;
-    return matchesGrado && matchesCategoria;
-  });
+  const [rankings, setRankings] = useState<any[]>([]);
+  const [filteredRankings, setFilteredRankings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchRankings() {
+      try {
+        const response = await fetch("/api/rankings");
+        if (!response.ok) {
+          throw new Error("Error al obtener los rankings");
+        }
+        const data = await response.json();
+        setRankings(data);
+        setFilteredRankings(data); // Inicializa el estado filtrado con todos los datos
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRankings();
+  }, []);
+
+  // Efecto para filtrar rankings cuando cambian los filtros
+  useEffect(() => {
+    if (!rankings.length) return;
+
+    const isTodosGrados = !gradoFilter || gradoFilter === "Todos los Grados";
+    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Todas las Cagegorias";
+
+    if (isTodosGrados && isTodasCategorias) {
+      // Mostrar todos los registros si ambos filtros están en "Todos"
+      setFilteredRankings(rankings);
+    } else {
+      // Aplicar filtros específicos
+      const filtered = rankings.filter((ranking) => {
+        const matchesGrado = isTodosGrados || ranking.grado === gradoFilter;
+        const matchesCategoria = isTodasCategorias || ranking.categoria === categoriaFilter;
+        return matchesGrado && matchesCategoria;
+      });
+
+      setFilteredRankings(filtered);
+    }
+  }, [gradoFilter, categoriaFilter, rankings]);
+
+  if (loading) {
+    return <div>Cargando rankings...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
@@ -46,9 +94,6 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
                   ))}
                 </div>
               </td>
-
-
-
               <td className="p-4">
                 <Image
                   src={ranking.image}

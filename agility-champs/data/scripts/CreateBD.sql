@@ -43,11 +43,16 @@ CREATE TABLE Duplas (
     GradoID INT NOT NULL,
     CategoriaID INT NOT NULL,
     flag_activo BOOLEAN, 
+    FotoURL VARCHAR(255),
     FOREIGN KEY (UsuarioID) REFERENCES Usuarios(UsuarioID),
     FOREIGN KEY (EscuelaID) REFERENCES Escuelas(EscuelaID),
     FOREIGN KEY (GradoID) REFERENCES Grados(GradoID),
     FOREIGN KEY (CategoriaID) REFERENCES Categorias(CategoriaID)
 );
+
+ 
+
+
 
 
 
