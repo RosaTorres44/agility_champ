@@ -87,13 +87,12 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
               <td className="p-4">{ranking.handlerName}</td>
               <td className="p-4">{ranking.grado}</td>
               <td className="p-4">{ranking.categoria}</td>
-              <td className="p-4">
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: ranking?.rating || 0 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-              </td>
+                    <td className="p-4">
+                    {ranking.rating}
+                    {ranking.rating === 1 && <Star className="inline-block ml-2 text-yellow-500" />}
+                    {ranking.rating === 2 && <Star className="inline-block ml-2 text-gray-500" />}
+                    {ranking.rating === 3 && <Star className="inline-block ml-2 text-orange-500" />}
+                    </td>
               <td className="p-4">
                 <Image
                   src={ranking.image}

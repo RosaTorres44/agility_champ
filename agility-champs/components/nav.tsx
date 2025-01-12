@@ -54,6 +54,14 @@ export function Nav() {
               >
                 Mi Desempeño
               </Link>
+              <Link
+                href="/admin"
+                className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
+                  pathname === '/performance' ? 'text-indigo-600' : 'text-gray-500'
+                }`}
+              >
+                Administrar
+              </Link>
             </div>
           </div>
 

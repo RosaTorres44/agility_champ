@@ -9,7 +9,7 @@ export async function GET() {
         u.Nombre AS handlerName, 
         g.Nombre AS grado, 
         c.Nombre AS categoria, 
-        r.Posicion, 
+        r.Posicion as rating, 
         d.FotoURL AS image 
       FROM Usuarios u 
       INNER JOIN Duplas d ON u.UsuarioID = d.UsuarioID  
