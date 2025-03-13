@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export", // Fuerza la exportación estática
-  experimental: {
-    appDir: true,
+  output: "export", // Asegura que estás usando static export
+  async exportPathMap(defaultPathMap) {
+    delete defaultPathMap["/admin"]; // Excluir la página de admin
+    return defaultPathMap;
   },
 };
 
