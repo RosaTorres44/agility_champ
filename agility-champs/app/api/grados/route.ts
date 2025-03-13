@@ -3,7 +3,7 @@ import { pool } from "@/data/db";
 
 export async function GET() {
   try {
-    const query = "SELECT Nombre FROM Grados";
+    const query = "SELECT des_grado Nombre FROM grado ORDER BY id_grado ASC";
     console.log("Executing query:", query); // Depuración
 
     const [rows] = await pool.query(query);

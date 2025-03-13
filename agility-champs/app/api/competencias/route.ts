@@ -4,9 +4,9 @@ import { pool } from "@/data/db";
 export async function GET() {
   try {
     const query = `
-    SELECT 
-         CompetenciaID as id , Nombre as name , FechaInicio as email, FechaFin as role 
-   FROM Competencias u    ; ; 
+  SELECT 
+         id_competencia as id , des_competencia as name , fec_inicio as email, fec_fin as role 
+   FROM competencia u    ;
     `;
 
     console.log("Executing query:", query); // Depuración

@@ -4,19 +4,19 @@ import { pool } from "@/data/db";
 export async function GET() {
   try {
     const query = `
-      SELECT 
-        d.NombrePerro AS dogName, 
-        u.Nombre AS handlerName, 
-        g.Nombre AS grado, 
-        c.Nombre AS categoria, 
-        r.Posicion as rating, 
-        d.FotoURL AS image 
-      FROM Usuarios u 
-      INNER JOIN Duplas d ON u.UsuarioID = d.UsuarioID  
-      INNER JOIN Grados g ON g.GradoID = d.GradoID  
-      INNER JOIN Categorias c ON c.CategoriaID = d.CategoriaID  
-      INNER JOIN Resultados r ON r.DuplaID = d.DuplaID  
-      ORDER BY r.Posicion ASC
+    SELECT 
+    perro.des_nombres AS dogName, 
+    persona.des_nombres AS handlerName, 
+    grado.des_grado AS grado, 
+    categoria.des_categoria  AS categoria, 
+    resultado.num_posicion  as rating, 
+    '' AS image   
+    FROM resultados resultado 
+    left join dupla dupla on resultado.id_dupla = dupla.id_dupla 
+    left join persona persona on dupla.id_persona = persona.id_persona
+    left join perro perro on dupla.id_perro = perro.id_perro 
+    left join categoria categoria on dupla.id_categoria = categoria.id_categoria
+    left join grado grado on dupla.id_grado = grado.id_grado 
     `;
 
     console.log("Executing query:", query); // Depuración

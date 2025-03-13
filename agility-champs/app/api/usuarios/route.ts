@@ -5,8 +5,9 @@ export async function GET() {
   try {
     const query = `
      SELECT 
-         UsuarioID as id , Nombre as name , CorreoElectronico as email, Rol as role, FLG_ACTIVO AS active
-   FROM Usuarios u  limit 5   ; 
+        p.id_persona  as id , des_nombres as name , des_correo as email,
+         des_rol as role, flg_activo AS active
+   FROM persona p  ; 
     `;
 
     console.log("Executing query:", query); // Depuración

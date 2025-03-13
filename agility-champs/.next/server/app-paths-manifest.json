@@ -1,11 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/api/categorias/route": "app/api/categorias/route.js",
-  "/api/rankings/route": "app/api/rankings/route.js",
-  "/api/grados/route": "app/api/grados/route.js",
-  "/competitions/page": "app/competitions/page.js",
-  "/performance/page": "app/performance/page.js",
   "/admin/page": "app/admin/page.js",
-  "/api/usuarios/route": "app/api/usuarios/route.js"
+  "/competitions/page": "app/competitions/page.js",
+  "/api/categorias/route": "app/api/categorias/route.js",
+  "/api/grados/route": "app/api/grados/route.js",
+  "/api/rankings/route": "app/api/rankings/route.js"
 }
