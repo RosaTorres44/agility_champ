@@ -6,6 +6,14 @@ npm install axios  --force
 npm install next react react-dom  --force
 
 
+npm install -g @railway/cli
+railway login --browserless
+railway link
+railway connect
+
+SOURCE /Users/rosa/Proyectos/agilityweb/data/scripts/datatest.sql
+
+
 Si tu proyecto usa Next.js, puedes ejecutarlo con:
 
 npm run build

@@ -14,7 +14,7 @@ CREATE TABLE `persona` (
   `flg_activo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_persona`),
   UNIQUE KEY `des_correo` (`des_correo`)
-)  
+)  ;
 
 
 -- Tabla de razas
@@ -90,8 +90,7 @@ CREATE TABLE dupla (
     FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
     FOREIGN KEY (id_persona) REFERENCES persona(id_persona),
     FOREIGN KEY (id_grado) REFERENCES grado(id_grado) ,
-    FOREIGN KEY (id_categoria) REFERENCES cate(id_categoria) 
-
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria) 
 );
 
 
