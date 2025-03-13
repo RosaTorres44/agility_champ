@@ -10,10 +10,14 @@ import { TablaResultados } from "@/components/TablaResultados";
 
 export const dynamic = "force-dynamic";
 
-const opcionesIniciales = {
-  guias: ["Guía", "Rosita", "Laura", "Mario"],
+type OpcionesIniciales = {
+  perros: { [key: string]: string[] };
+  competencias: string[];
+  pistas: string[];
+};
+
+const opcionesIniciales: OpcionesIniciales = {
   perros: {
-    Rosita: ["Perro", "Zoé", "Hanna"],
     Laura: ["Perro", "Bruno"],
     Mario: ["Perro", "Maya"],
   },
@@ -22,25 +26,44 @@ const opcionesIniciales = {
 };
 
 export default function PerformancePage() {
-  const [selectedGuia, setSelectedGuia] = useState<keyof typeof opcionesIniciales.perros | "Guía">("Guía");
+  const [selectedGuia, setSelectedGuia] = useState("Guía");
   const [selectedPerro, setSelectedPerro] = useState("Perro");
   const [selectedCompetencia, setSelectedCompetencia] = useState("Competencia");
   const [selectedPista, setSelectedPista] = useState("Pista");
 
+  const [guias, setGuias] = useState<string[]>([]);
   const [perros, setPerros] = useState<string[]>([]);
   const [competencias, setCompetencias] = useState<string[]>([]);
   const [pistas, setPistas] = useState<string[]>([]);
 
+  // 🔹 Cargar Guías desde la API
   useEffect(() => {
-    setPerros(selectedGuia !== "Guía" ? opcionesIniciales.perros[selectedGuia as keyof typeof opcionesIniciales.perros] || ["Perro"] : []);
+    async function loadGuias() {
+      try {
+        const data = await fetchData("personas", "active");
+        const nombres = data.map((persona: { Nombre: string }) => persona.Nombre);
+        setGuias(["Guía", ...nombres]); // Agrega "Guía" como opción inicial
+        setPerros(selectedGuia !== "Guía" ? opcionesIniciales.perros[selectedGuia as keyof typeof opcionesIniciales.perros] || ["Perro"] : []);
+      } catch (error) {
+        console.error("Error cargando guías:", error);
+      }
+    }
+    loadGuias();
+  }, []);
+
+  // 🔹 Cargar perros según la guía seleccionada
+  useEffect(() => {
+    setPerros(selectedGuia !== "Guía" ? opcionesIniciales.perros[selectedGuia] || ["Perro"] : []);
     setSelectedPerro("Perro");
   }, [selectedGuia]);
 
+  // 🔹 Cargar competencias según el perro seleccionado
   useEffect(() => {
     setCompetencias(selectedPerro !== "Perro" ? opcionesIniciales.competencias : []);
     setSelectedCompetencia("Competencia");
   }, [selectedPerro]);
 
+  // 🔹 Cargar pistas según la competencia seleccionada
   useEffect(() => {
     setPistas(selectedCompetencia !== "Competencia" ? opcionesIniciales.pistas : []);
     setSelectedPista("Pista");
@@ -57,7 +80,7 @@ export default function PerformancePage() {
           <h2 className="text-lg font-semibold mb-2">Filtrar por:</h2>
 
           {/* Filtros */}
-          <FiltroDropdown label="Guía" opciones={opcionesIniciales.guias} selected={selectedGuia} setSelected={setSelectedGuia} />
+          <FiltroDropdown label="Guía" opciones={guias} selected={selectedGuia} setSelected={setSelectedGuia} />
           {selectedGuia !== "Guía" && <FiltroDropdown label="Perro" opciones={perros} selected={selectedPerro} setSelected={setSelectedPerro} />}
           {selectedPerro !== "Perro" && <FiltroDropdown label="Competencia" opciones={competencias} selected={selectedCompetencia} setSelected={setSelectedCompetencia} />}
           {selectedCompetencia !== "Competencia" && <FiltroDropdown label="Pista" opciones={pistas} selected={selectedPista} setSelected={setSelectedPista} />}
@@ -81,7 +104,7 @@ export default function PerformancePage() {
 }
 
 /** 🔹 Componente reutilizable para los filtros */
-function FiltroDropdown<T extends string>({ label, opciones, selected, setSelected }: { label: string; opciones: string[]; selected: T; setSelected: (value: T) => void }) {
+function FiltroDropdown({ label, opciones, selected, setSelected }: { label: string; opciones: string[]; selected: string; setSelected: (value: string) => void }) {
   return (
     <div className="flex flex-col"> 
       <DropdownMenu>
@@ -92,7 +115,7 @@ function FiltroDropdown<T extends string>({ label, opciones, selected, setSelect
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[250px]">
           {opciones.map((opcion) => (
-            <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion as T)}>
+            <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion)}>
               {opcion}
             </DropdownMenuItem>
           ))}
@@ -100,4 +123,19 @@ function FiltroDropdown<T extends string>({ label, opciones, selected, setSelect
       </DropdownMenu>
     </div>
   );
+}
+
+/** 🔹 Función para obtener datos de la API */
+async function fetchData(endpoint: string, filter?: "active" | "all", competitionId?: number | null) {
+  let url = `/api/${endpoint}`;
+
+  if (filter === "active") {
+    url += "?active=1";
+  } else if (competitionId) {
+    url += `?competitionId=${competitionId}`;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Error al obtener los datos de ${endpoint}`);
+  return response.json();
 }
