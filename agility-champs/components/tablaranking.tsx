@@ -87,7 +87,7 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, pistaFilter, fil
             <th className="text-left p-4">Categoría</th>
             <th className="text-left p-4">Pista</th>
             <th className="text-left p-4">Ranking</th> 
-            <th className="text-left p-4">Más detalles</th>
+            {/* <th className="text-left p-4">Más detalles</th> */}
           </tr>
         </thead>
         <tbody>
@@ -106,12 +106,12 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, pistaFilter, fil
                 {ranking.rating === 3 && <Star className="inline-block ml-2 text-orange-500" />}
               </td>
               <td className="p-4">
-                <Button 
+                {/* <Button 
                   size="sm"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   Ver detalles
-                </Button>
+                </Button> */}
               </td>
             </tr>
           ))}

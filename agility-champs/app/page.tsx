@@ -1,9 +1,8 @@
 import { Hero } from '@/components/hero'
 import { Nav } from '@/components/nav'
 import { Rankings } from '@/components/rankings'
-import { Competitions } from '@/components/competitions' 
-import { Registration } from '@/components/registration'
-import { Footer } from '@/components/footer'
+import { Competitions } from '@/components/competitions'  
+import { Pie } from '@/components/Pie'
 
 export default function Home() {
   return (
@@ -11,9 +10,8 @@ export default function Home() {
       <Nav />
       <Hero />
       <Rankings filter="active" />
-      <Competitions filter="active" /> 
-      <Registration />
-      <Footer />
+      <Competitions filter="active" />  
+      <Pie />
     </main>
   )
 }

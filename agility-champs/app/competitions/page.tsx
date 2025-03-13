@@ -1,17 +1,15 @@
 import { Header_nav } from '@/components/header_nav'
 import { Nav } from '@/components/nav'
-import { Competitions } from '@/components/competitions'
-import { Registration } from '@/components/registration'
-import { Footer } from '@/components/footer'
+import { Competitions } from '@/components/competitions' 
+import { Pie } from '@/components/Pie'
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
       <Nav />
-      <Header_nav />
+      <Header_nav title="Mis Competencias" /> 
       <Competitions filter="all" /> 
-      <Registration />
-      <Footer />
+      <Pie />
     </main>
   )
 }

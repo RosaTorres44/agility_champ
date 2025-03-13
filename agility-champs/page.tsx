@@ -2,9 +2,8 @@ import React from 'react'
 import { Hero } from './components/hero'
 import { Nav } from './components/nav'
 import { Rankings } from './components/rankings'
-import { UpcomingCompetitions } from './components/upcoming-competitions'
-import { Registration } from './components/registration'
-import { Footer } from './components/footer'
+import { Competitions } from './components/competitions' 
+import { Pie } from './components/Pie'
 
 export default function Page() {
   return (
@@ -12,9 +11,8 @@ export default function Page() {
       <Nav />
       <Hero />
       <Rankings />
-      <UpcomingCompetitions />
-      <Registration />
-      <Footer />
+      <Competitions /> 
+      <Pie />
     </div>
   )
 }
