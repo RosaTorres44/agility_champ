@@ -151,6 +151,20 @@ CREATE TABLE competencia (
          FOREIGN KEY (id_escuela) REFERENCES escuela(id_escuela)
 );
 
+/*
+                  let status = "Pendiente";
+            switch (flg_activo) {
+            case 1:
+              status = "En Curso";
+              break;
+            case -1:
+              status = "Cerrada";
+              break;
+            case 0:
+              status = "Próxima";
+              break;
+            }
+*/
 -- Tabla de Pistas
 DROP TABLE IF EXISTS pista;
 CREATE TABLE pista (

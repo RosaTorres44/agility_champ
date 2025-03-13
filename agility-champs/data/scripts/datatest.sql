@@ -89,6 +89,7 @@ INSERT INTO dupla (id_perro, id_persona, id_categoria, id_grado) VALUES
 INSERT INTO competencia (des_competencia, id_escuela, fec_inicio, fec_fin) VALUES
 ('Copa Nacional Agility 2024', 1, '2024-06-10', '2024-06-11'),
 ('Open Speed Runners', 2, '2024-07-15', '2024-07-16');
+('Copa Kay', 2, '2025-04-01', '2025-04-02');
 
 -- 🔹 Crear pistas en competencias
 INSERT INTO pista (des_pista, id_competencia, id_grado, id_categoria, id_persona, num_obstaculos, num_longitud, num_velocidad_maxima, num_velocidad_minima, num_tiempo_maximo, num_tiempo_minimo, des_tipo) VALUES
