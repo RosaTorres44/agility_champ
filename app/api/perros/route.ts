@@ -7,9 +7,8 @@ export async function GET() {
   try {
     const query = `
      SELECT 
-        p.id_persona  as id , des_nombres as name , des_correo as email,
-         des_rol as role, flg_activo AS active
-   FROM persona p  ; 
+        p.id_perro  as id , des_nombres as Nombre  , flg_activo AS active
+   FROM perro p  ; 
     `;
 
     console.log("Executing query:", query); // Depuración

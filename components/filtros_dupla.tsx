@@ -1,14 +1,23 @@
 "use client";
-import { useEffect, useState } from "react";
-import { DropdownFilter } from './boton_opciones';
-
  
+import { DropdownFilter } from "./boton_opciones";
 
-export function Filtros_Duplas(){
+interface FiltrosProps {
+  personaFilter: string | null;
+  setPersonaFilter: (value: string | null) => void;
+  perroFilter: string | null;
+  setPerroFilter: (value: string | null) => void;
+  filter?: "active" | "all";
+  competitionId?: number | null;
+}
+
+export function Filtros_Duplas({ personaFilter, setPersonaFilter, perroFilter, setPerroFilter}: FiltrosProps) { 
 
   return (
     <div className="flex gap-4 justify-center my-8">
-     
+      <DropdownFilter label="Personas" endpoint="personas" selectedOption={personaFilter} setSelectedOption={setPersonaFilter} />
+      <DropdownFilter label="Perros" endpoint="perros" selectedOption={perroFilter} setSelectedOption={setPerroFilter} />
     </div>
   );
 }
+ 

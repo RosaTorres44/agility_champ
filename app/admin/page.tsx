@@ -7,6 +7,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Nav } from "@/components/nav";
+import { Header_nav } from '@/components/header_nav';
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
@@ -49,6 +50,7 @@ function PageContent() {
   return (
     <main className="min-h-screen bg-white">
       <Nav />
+      <Header_nav title="Administracion" />
       <div className="hidden space-y-6 p-10 pb-16 md:block">
         <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
           <aside className="-mx-4 lg:w-1/5">
