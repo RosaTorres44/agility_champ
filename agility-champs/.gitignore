@@ -18,7 +18,7 @@ out/
 .env.local
 .env.*.local
 coverage/
-node_modules?
+node_modules/*
 .next/cache/webpack/client-development/2.pack.gz
 agility-champs/.next/cache/webpack/client-development/index.pack.gz
 agility-champs/.next/cache/webpack/client-development/index.pack.gz.old
