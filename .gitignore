@@ -30,5 +30,7 @@ node_modules/remark-react/*
 node_modules/remark-stringify/*
 node_modules/remark-wiki-link/* 
 node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node
-node_modules/
-
+node_modules/ 
+.env_local
+.env_web
+.env
