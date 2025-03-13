@@ -35,7 +35,7 @@ export function Nav() {
                   pathname === '/' ? 'text-indigo-600' : 'text-gray-500'
                 }`}
               >
-                Explorar
+                Inicio
               </Link>
               <Link
                 href="/competitions"

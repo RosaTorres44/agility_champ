@@ -23,11 +23,11 @@ export function GradoButton({ selectedOption, setSelectedOption }: { selectedOpt
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="bg-white hover:bg-gray-50">
-          {selectedOption || "Todos los Grados"}
+          {selectedOption || "Todos"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedOption("Todos los Grados")}>Todos los Grados</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setSelectedOption("Todos")}>Todos</DropdownMenuItem>
         {grados.map((grado) => (
           <DropdownMenuItem key={grado} onClick={() => setSelectedOption(grado)}>
             {grado}
@@ -59,11 +59,11 @@ const [categorias, setCategorias] = useState<string[]>([]);
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="bg-white hover:bg-gray-50">
-          {selectedOption || "Todas las Cagegorias"}
+          {selectedOption || "Todas"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedOption("Todas las Cagegorias")}>Todas las Cagegorias</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setSelectedOption("Todas")}>Todas</DropdownMenuItem>
         {categorias.map((categoria) => (
           <DropdownMenuItem key={categoria} onClick={() => setSelectedOption(categoria)}>
             {categoria}

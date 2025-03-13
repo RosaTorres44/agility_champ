@@ -94,7 +94,9 @@ INSERT INTO competencia (des_competencia, id_escuela, fec_inicio, fec_fin) VALUE
 -- 🔹 Crear pistas en competencias
 INSERT INTO pista (des_pista, id_competencia, id_grado, id_categoria, id_persona, num_obstaculos, num_longitud, num_velocidad_maxima, num_velocidad_minima, num_tiempo_maximo, num_tiempo_minimo, des_tipo) VALUES
 ('Pista de Saltos', 1, 1, 2, 3, 12, 110.00, 5.80, 2.90, 38.00, 18.00, 'Jumping'),
-('Pista Técnica', 2, 2, 3, 3, 15, 130.00, 5.50, 2.75, 42.00, 22.00, 'Agility');
+('Pista Técnica', 2, 2, 3, 3, 15, 130.00, 5.50, 2.75, 42.00, 22.00, 'Agility'),
+('Pista Requisito', 2, 2, 3, 3, 15, 130.00, 5.50, 2.75, 42.00, 22.00, 'Agility');
+
 
 -- 🔹 Insertar resultados de competencias
 INSERT INTO resultados (id_pista, id_dupla, num_tiempo, num_rehuse, num_faltas, num_posicion, num_penalizacion_recorrido, num_penalizacion_tiempo, num_total_penalizaciones, num_velocidad, flg_medalla, flg_mejor_velocidad) VALUES

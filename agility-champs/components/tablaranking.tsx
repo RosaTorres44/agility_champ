@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 interface TablaRankingProps {
   gradoFilter: string | null;
   categoriaFilter: string | null;
+  competitionId?: number | null; // ID de la competencia seleccionada o null para la última activa
 }
 
-export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingProps) {
+export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = null }: TablaRankingProps) {
   const [rankings, setRankings] = useState<any[]>([]);
   const [filteredRankings, setFilteredRankings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,12 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
   useEffect(() => {
     async function fetchRankings() {
       try {
-        const response = await fetch("/api/rankings");
+        // 🚀 Construimos la URL según si queremos la última competencia activa o una específica
+        const url = competitionId 
+          ? `/api/rankings?competencia_id=${competitionId}`
+          : `/api/rankings?last_active=1`;
+
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Error al obtener los rankings");
         }
@@ -34,14 +40,14 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
     }
 
     fetchRankings();
-  }, []);
+  }, [competitionId]); // 🔹 Se ejecuta al cambiar el ID de la competencia
 
   // Efecto para filtrar rankings cuando cambian los filtros
   useEffect(() => {
     if (!rankings.length) return;
 
-    const isTodosGrados = !gradoFilter || gradoFilter === "Todos los Grados";
-    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Todas las Cagegorias";
+    const isTodosGrados = !gradoFilter || gradoFilter === "Todos";
+    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Todas";
 
     if (isTodosGrados && isTodasCategorias) {
       // Mostrar todos los registros si ambos filtros están en "Todos"
@@ -75,6 +81,7 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
             <th className="text-left p-4">Nombre Guía</th>
             <th className="text-left p-4">Grado</th>
             <th className="text-left p-4">Categoría</th>
+            <th className="text-left p-4">Pista</th>
             <th className="text-left p-4">Ranking</th>
             <th className="text-left p-4">Foto</th>
             <th className="text-left p-4">Más detalles</th>
@@ -87,12 +94,13 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter }: TablaRankingPr
               <td className="p-4">{ranking.handlerName}</td>
               <td className="p-4">{ranking.grado}</td>
               <td className="p-4">{ranking.categoria}</td>
-                    <td className="p-4">
-                    {ranking.rating}
-                    {ranking.rating === 1 && <Star className="inline-block ml-2 text-yellow-500" />}
-                    {ranking.rating === 2 && <Star className="inline-block ml-2 text-gray-500" />}
-                    {ranking.rating === 3 && <Star className="inline-block ml-2 text-orange-500" />}
-                    </td>
+              <td className="p-4">{ranking.pista}</td>
+              <td className="p-4">
+                {ranking.rating}
+                {ranking.rating === 1 && <Star className="inline-block ml-2 text-yellow-500" />}
+                {ranking.rating === 2 && <Star className="inline-block ml-2 text-gray-500" />}
+                {ranking.rating === 3 && <Star className="inline-block ml-2 text-orange-500" />}
+              </td>
               <td className="p-4">
                 <Image
                   src={ranking.image}

@@ -9,8 +9,10 @@ export async function GET() {
         persona.des_nombres AS handlerName, 
         grado.des_grado AS grado, 
         categoria.des_categoria AS categoria, 
+        pista.des_pista AS pista,
         resultado.num_posicion AS rating, 
-        '' AS image    
+        '' AS image    ,
+        competencia.flg_activo   
         FROM resultados resultado 
         LEFT JOIN pista pista ON resultado.id_pista = pista.id_pista
         LEFT JOIN competencia competencia ON pista.id_competencia = competencia.id_competencia
