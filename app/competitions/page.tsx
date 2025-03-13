@@ -2,6 +2,8 @@ import { Header_nav } from '@/components/header_nav'
 import { Nav } from '@/components/nav'
 import { Competitions } from '@/components/competitions' 
 import { Pie } from '@/components/Pie'
+export const dynamic = "force-dynamic";
+
 
 export default function Home() {
   return (

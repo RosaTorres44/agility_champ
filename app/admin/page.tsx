@@ -1,31 +1,35 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { UsersTable } from "@/components/users-table";
 import { UserForm } from "@/components/user-form";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Nav } from "@/components/nav";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
+function SearchParamsWrapper() {
+  const searchParams = useSearchParams();
+  return searchParams.get("view") || "usuarios";
+}
+
 const navigation = [
-  {
-    href: "/admin?view=usuarios",
-    title: "Usuarios",
-    icon: "users" as const,
-  },
-  {
-    href: "/admin?view=competencias",
-    title: "Competencias",
-    icon: "trophy" as const,
-  },
+  { href: "/admin?view=usuarios", title: "Usuarios", icon: "users" as const },
+  { href: "/admin?view=competencias", title: "Competencias", icon: "trophy" as const },
 ];
 
 export default function AdminPage() {
-  const searchParams = useSearchParams();
-  const view = searchParams.get("view") || "usuarios"; // Obtén el parámetro 'view'
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <PageContent />
+    </Suspense>
+  );
+}
+
+function PageContent() {
+  const view = SearchParamsWrapper();
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export default function AdminPage() {
     };
 
     fetchData();
-  }, [view]); // Actualiza los datos cuando cambia el parámetro 'view'
+  }, [view]);
 
   return (
     <main className="min-h-screen bg-white">
@@ -78,7 +82,6 @@ export default function AdminPage() {
                 {view === "competencias" ? (
                   <div>
                     <h2>Competencias</h2>
-                    {/* Aquí puedes añadir un componente de tabla para competencias */}
                   </div>
                 ) : (
                   <UsersTable users={data} />

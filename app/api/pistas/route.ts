@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
+export const dynamic = "force-dynamic";
+
 
 // Obtener el ID de la competencia desde los parámetros de la URL
 export async function GET(req: Request) {

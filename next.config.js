@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",  // 🚀 Asegura que Next.js usa SSR
+  output: "standalone",  
   experimental: {
-    serverActions: true,  // 🚀 Permite funciones dinámicas en App Router
+    serverActions: true,  
   },
   reactStrictMode: true,
-  trailingSlash: false,  // 🚀 Evita problemas con rutas
 };
 
 module.exports = nextConfig;
