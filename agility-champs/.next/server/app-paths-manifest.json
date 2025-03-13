@@ -1,10 +1,8 @@
 {
   "/page": "app/page.js",
   "/competitions/page": "app/competitions/page.js",
-  "/performance/page": "app/performance/page.js",
   "/api/competencias/route": "app/api/competencias/route.js",
   "/api/categorias/route": "app/api/categorias/route.js",
-  "/api/rankings/route": "app/api/rankings/route.js",
   "/api/grados/route": "app/api/grados/route.js",
   "/api/pistas/route": "app/api/pistas/route.js"
 }

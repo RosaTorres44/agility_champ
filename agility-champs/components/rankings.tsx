@@ -3,9 +3,14 @@ import { Filtros } from './filtros';
 import { TablaRankingOri } from './tablaranking';
 import { useState } from 'react';
 
-export function Rankings() {
+interface CompetitionsProps {
+  filter?: "active" | "all";
+}
+
+export function Rankings({ filter }: CompetitionsProps)  {
   const [gradoFilter, setGradoFilter] = useState<string | null>(null);
   const [categoriaFilter, setCategoriaFilter] = useState<string | null>(null);
+  const [pistaFilter, setPistaFilter] = useState<string | null>(null);
 
   return (
     <section className="py-12 px-6 sm:px-12">
@@ -18,8 +23,10 @@ export function Rankings() {
         setGradoFilter={setGradoFilter} 
         categoriaFilter={categoriaFilter} 
         setCategoriaFilter={setCategoriaFilter} 
+        pistaFilter={pistaFilter} 
+        setPistaFilter={setPistaFilter} 
       />
-      <TablaRankingOri gradoFilter={gradoFilter} categoriaFilter={categoriaFilter} />
+      <TablaRankingOri gradoFilter={gradoFilter} categoriaFilter={categoriaFilter} pistaFilter={pistaFilter} filter={filter} />
     </section>
   );
 }

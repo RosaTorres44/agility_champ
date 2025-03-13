@@ -10,7 +10,7 @@ export default function Home() {
     <main className="min-h-screen bg-white">
       <Nav />
       <Hero />
-      <Rankings />
+      <Rankings filter="active" />
       <Competitions filter="active" /> 
       <Registration />
       <Footer />

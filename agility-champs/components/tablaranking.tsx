@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TablaRankingProps {
   gradoFilter: string | null;
   categoriaFilter: string | null;
+  pistaFilter: string | null;
+  filter: string | null | undefined;
   competitionId?: number | null; // ID de la competencia seleccionada o null para la última activa
 }
 
-export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = null }: TablaRankingProps) {
+export function TablaRankingOri({ gradoFilter, categoriaFilter, pistaFilter, filter, competitionId = null }: TablaRankingProps) {
   const [rankings, setRankings] = useState<any[]>([]);
   const [filteredRankings, setFilteredRankings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,10 +47,11 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = 
   useEffect(() => {
     if (!rankings.length) return;
 
-    const isTodosGrados = !gradoFilter || gradoFilter === "Todos";
-    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Todas";
+    const isTodosGrados = !gradoFilter || gradoFilter === "Grados";
+    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Categorías";
+    const isTodasPistas = !pistaFilter || pistaFilter === "Pistas";
 
-    if (isTodosGrados && isTodasCategorias) {
+    if (isTodosGrados && isTodasCategorias && isTodasPistas) {
       // Mostrar todos los registros si ambos filtros están en "Todos"
       setFilteredRankings(rankings);
     } else {
@@ -57,12 +59,13 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = 
       const filtered = rankings.filter((ranking) => {
         const matchesGrado = isTodosGrados || ranking.grado === gradoFilter;
         const matchesCategoria = isTodasCategorias || ranking.categoria === categoriaFilter;
-        return matchesGrado && matchesCategoria;
+        const matchesPista = isTodasPistas || ranking.pista === pistaFilter;
+        return matchesGrado && matchesCategoria && matchesPista;
       });
 
       setFilteredRankings(filtered);
     }
-  }, [gradoFilter, categoriaFilter, rankings]);
+  }, [gradoFilter, categoriaFilter, pistaFilter, rankings]);
 
   if (loading) {
     return <div>Cargando rankings...</div>;
@@ -77,19 +80,20 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = 
       <table className="w-full">
         <thead>
           <tr className="border-b">
+            <th className="text-left p-4">Competencia</th>
             <th className="text-left p-4">Nombre Perro</th>
             <th className="text-left p-4">Nombre Guía</th>
             <th className="text-left p-4">Grado</th>
             <th className="text-left p-4">Categoría</th>
             <th className="text-left p-4">Pista</th>
-            <th className="text-left p-4">Ranking</th>
-            <th className="text-left p-4">Foto</th>
+            <th className="text-left p-4">Ranking</th> 
             <th className="text-left p-4">Más detalles</th>
           </tr>
         </thead>
         <tbody>
           {filteredRankings.map((ranking, index) => (
             <tr key={index} className="border-b">
+              <td className="p-4">{ranking.competitionName}</td>
               <td className="p-4">{ranking.dogName}</td>
               <td className="p-4">{ranking.handlerName}</td>
               <td className="p-4">{ranking.grado}</td>
@@ -100,15 +104,6 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, competitionId = 
                 {ranking.rating === 1 && <Star className="inline-block ml-2 text-yellow-500" />}
                 {ranking.rating === 2 && <Star className="inline-block ml-2 text-gray-500" />}
                 {ranking.rating === 3 && <Star className="inline-block ml-2 text-orange-500" />}
-              </td>
-              <td className="p-4">
-                <Image
-                  src={ranking.image}
-                  alt={`${ranking.dogName}'s photo`}
-                  width={50}
-                  height={50}
-                  className="rounded-full"
-                />
               </td>
               <td className="p-4">
                 <Button 

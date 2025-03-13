@@ -12,7 +12,8 @@ export async function GET() {
         pista.des_pista AS pista,
         resultado.num_posicion AS rating, 
         '' AS image    ,
-        competencia.flg_activo   
+        competencia.flg_activo ,
+        competencia.des_competencia AS competitionName 
         FROM resultados resultado 
         LEFT JOIN pista pista ON resultado.id_pista = pista.id_pista
         LEFT JOIN competencia competencia ON pista.id_competencia = competencia.id_competencia

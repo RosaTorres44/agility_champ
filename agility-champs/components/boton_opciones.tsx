@@ -3,34 +3,36 @@ import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
+interface DropdownFilterProps {
+  label: string;
+  endpoint: string;
+  selectedOption: string | null;
+  setSelectedOption: (option: string) => void;
+  filter?: "active" | "all";
+  competitionId?: number | null;
+}
 
-export function GradoButton({ selectedOption, setSelectedOption }: { selectedOption: string | null; setSelectedOption: (option: string) => void }) {
-  const [grados, setGrados] = useState<string[]>([]);
+export function DropdownFilter({ label, endpoint, selectedOption, setSelectedOption, filter = "all", competitionId }: DropdownFilterProps) {
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
-    async function loadGrados() {
-      try {
-        const data = await fetchData('grados');
-        setGrados(data.map((grado: { Nombre: string }) => grado.Nombre));
-      } catch (error) {
-        console.error("Error al cargar los grados:", error);
-      }
-    }
-    loadGrados();
-  }, []);
+    fetchData(endpoint, filter, competitionId)
+      .then(data => setOptions(data.map((item: { Nombre: string }) => item.Nombre)))
+      .catch(error => console.error(`Error al cargar ${label.toLowerCase()}:`, error));
+  }, [endpoint, label, filter, competitionId]);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="bg-white hover:bg-gray-50">
-          {selectedOption || "Todos"}
+          {selectedOption || label}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedOption("Todos")}>Todos</DropdownMenuItem>
-        {grados.map((grado) => (
-          <DropdownMenuItem key={grado} onClick={() => setSelectedOption(grado)}>
-            {grado}
+        <DropdownMenuItem onClick={() => setSelectedOption(label)}>{label}</DropdownMenuItem>
+        {options.map((option) => (
+          <DropdownMenuItem key={option} onClick={() => setSelectedOption(option)}>
+            {option}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -38,46 +40,29 @@ export function GradoButton({ selectedOption, setSelectedOption }: { selectedOpt
   );
 }
 
+async function fetchData(endpoint: string, filter?: "active" | "all", competitionId?: number | null) {
+  let url = `/api/${endpoint}`;
 
-export function CategoriaButton({ selectedOption, setSelectedOption }: { selectedOption: string | null; setSelectedOption: (option: string) => void }) {
-const [categorias, setCategorias] = useState<string[]>([]);
-
-
-  useEffect(() => {
-    async function loadCategorias() {
-      try {
-        const data = await fetchData('categorias');
-        setCategorias(data.map((grado: { Nombre: string }) => grado.Nombre));
-      } catch (error) {
-        console.error("Error al cargar las categorias:", error);
-      }
-    }
-    loadCategorias();
-  }, []);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="bg-white hover:bg-gray-50">
-          {selectedOption || "Todas"}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSelectedOption("Todas")}>Todas</DropdownMenuItem>
-        {categorias.map((categoria) => (
-          <DropdownMenuItem key={categoria} onClick={() => setSelectedOption(categoria)}>
-            {categoria}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-async function fetchData(endpoint: string) {
-  const response = await fetch(`/api/${endpoint}`); // Ruta dinámica basada en el parámetro
-  if (!response.ok) {
-    throw new Error(`Error al obtener los datos de ${endpoint}`);
+  if (endpoint === "pistas") {
+    const compId = filter === "active" ? await getActiveCompetitionId() : competitionId;
+    if (compId) url = `/api/pistas?competencia_id=${compId}`;
   }
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Error al obtener los datos de ${endpoint}`);
   return response.json();
+}
+
+async function getActiveCompetitionId() {
+  try {
+    const response = await fetch("/api/competencias");
+    if (!response.ok) throw new Error("Error al obtener las competencias");
+
+    const data = await response.json();
+    const activeCompetition = data.find((comp: any) => comp.flg_activo === 1);
+    return activeCompetition ? activeCompetition.id_competencia : null;
+  } catch (error) {
+    console.error("Error al obtener la competencia activa:", error);
+    return null;
+  }
 }

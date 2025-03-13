@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     // Consulta SQL con parámetro seguro
     const query = `
       SELECT 
+       pista.des_pista AS Nombre,
         competencia.des_competencia AS competencia, 
         grado.des_grado AS grado, 
         categoria.des_categoria AS categoria, 
