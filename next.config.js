@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export", // Fuerza la exportación estática
   experimental: {
-    appDir: true,  // Asegura que App Router está habilitado
+    appDir: true,
   },
 };
-  
-  module.exports = nextConfig;
-  
+
+module.exports = nextConfig;
