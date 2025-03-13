@@ -51,7 +51,7 @@ export function UsersTable({ users }: { users: User[] }) {
               <TableCell>{user.role}</TableCell>
               <TableCell>
               <Button className="bg-[#6366F1] hover:bg-[#4F46E5]">
-                Actualizar
+                <MoreHorizontal className="w-4 h-4 text-white" />
               </Button>
               </TableCell>
             </TableRow>
