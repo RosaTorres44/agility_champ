@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export", // Asegura que estás usando static export
-  async exportPathMap(defaultPathMap) {
-    delete defaultPathMap["/admin"]; // Excluir la página de admin
-    return defaultPathMap;
+  output: "standalone",  // 🚀 Asegura que Next.js usa SSR
+  experimental: {
+    serverActions: true,  // 🚀 Permite funciones dinámicas en App Router
   },
+  reactStrictMode: true,
+  trailingSlash: false,  // 🚀 Evita problemas con rutas
 };
 
 module.exports = nextConfig;
