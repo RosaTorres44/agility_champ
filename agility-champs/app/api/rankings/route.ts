@@ -4,19 +4,26 @@ import { pool } from "@/data/db";
 export async function GET() {
   try {
     const query = `
-    SELECT 
-    perro.des_nombres AS dogName, 
-    persona.des_nombres AS handlerName, 
-    grado.des_grado AS grado, 
-    categoria.des_categoria  AS categoria, 
-    resultado.num_posicion  as rating, 
-    '' AS image   
-    FROM resultados resultado 
-    left join dupla dupla on resultado.id_dupla = dupla.id_dupla 
-    left join persona persona on dupla.id_persona = persona.id_persona
-    left join perro perro on dupla.id_perro = perro.id_perro 
-    left join categoria categoria on dupla.id_categoria = categoria.id_categoria
-    left join grado grado on dupla.id_grado = grado.id_grado 
+        SELECT 
+        perro.des_nombres AS dogName, 
+        persona.des_nombres AS handlerName, 
+        grado.des_grado AS grado, 
+        categoria.des_categoria AS categoria, 
+        resultado.num_posicion AS rating, 
+        '' AS image    
+        FROM resultados resultado 
+        LEFT JOIN pista pista ON resultado.id_pista = pista.id_pista
+        LEFT JOIN competencia competencia ON pista.id_competencia = competencia.id_competencia
+        LEFT JOIN dupla dupla ON resultado.id_dupla = dupla.id_dupla 
+        LEFT JOIN persona persona ON dupla.id_persona = persona.id_persona
+        LEFT JOIN perro perro ON dupla.id_perro = perro.id_perro 
+        LEFT JOIN categoria categoria ON dupla.id_categoria = categoria.id_categoria
+        LEFT JOIN grado grado ON dupla.id_grado = grado.id_grado
+        WHERE competencia.flg_activo = 
+        (CASE 
+        WHEN EXISTS (SELECT 1 FROM competencia WHERE flg_activo = 1) THEN 1
+        ELSE -1
+        END);
     `;
 
     console.log("Executing query:", query); // Depuración

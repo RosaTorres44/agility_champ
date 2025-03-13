@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export function Hero() {
   return (
-    <div className="relative h-[600px] w-full">
+    <div className="relative h-[400px] w-full">
       <Image
       src="/cabecera.jpeg"
       alt="imagen de cabecera"

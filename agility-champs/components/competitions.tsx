@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from "react"
 
-export function UpcomingCompetitions() {
-  interface Competition {
-    title: string;
-    date: string;
-    escuela: string;
-    status: string;
-  }
+interface Competition {
+  title: string;
+  date: string;
+  escuela: string;
+  status: string;
+}
 
+interface CompetitionsProps {
+  filter?: "active" | "all";
+}
+
+export function Competitions({ filter = "all" }: CompetitionsProps) {
   const [competitions, setCompetitions] = useState<Competition[]>([])
 
   useEffect(() => {
@@ -46,8 +50,10 @@ export function UpcomingCompetitions() {
           };
         }) : [];
 
-        // 🔹 Filtrar solo competencias "Próxima" o "En Curso"
-        const filteredCompetitions = formattedData.filter(comp => comp.status === "Próxima" || comp.status === "En Curso");
+        // Aplicar filtro según la prop `filter`
+        const filteredCompetitions = filter === "active"
+          ? formattedData.filter(comp => comp.status === "Próxima" || comp.status === "En Curso")
+          : formattedData;
 
         setCompetitions(filteredCompetitions)
       } catch (error) {
@@ -56,11 +62,13 @@ export function UpcomingCompetitions() {
     }
 
     fetchCompetitions()
-  }, [])
+  }, [filter])
 
   return (
     <section className="py-12 px-6 bg-gray-50 sm:px-12">
-      <h2 className="text-2xl font-bold text-center mb-8">Competencias Activas</h2>
+      <h2 className="text-2xl font-bold text-center mb-8">
+        {filter === "active" ? "Competencias Activas" : "Todas las Competencias"}
+      </h2>
 
       <div className="flex flex-wrap justify-center gap-6">
         {competitions.length > 0 ? (
@@ -70,14 +78,18 @@ export function UpcomingCompetitions() {
               <p className="text-sm text-muted-foreground">Fecha: {competition.date}</p>
               <p className="text-sm text-muted-foreground">Escuela: {competition.escuela}</p>
               <p className={`text-sm font-semibold ${
-                competition.status === "En Curso" ? "text-green-500" : "text-yellow-500"
+                competition.status === "En Curso" ? "text-green-500" :
+                competition.status === "Cerrada" ? "text-gray-500" :
+                "text-yellow-500"
               }`}>
                 Estado: {competition.status}
               </p>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500">No hay competencias activas en este momento.</p>
+          <p className="text-center text-gray-500">
+            No hay competencias disponibles en este momento.
+          </p>
         )}
       </div>
     </section>
