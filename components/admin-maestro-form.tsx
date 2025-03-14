@@ -1,9 +1,8 @@
-'use client'
-
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -11,100 +10,78 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 
-const userFormSchema = z.object({
+// 🔹 Definir esquema para escuela
+const escuelaFormSchema = z.object({
   name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+    message: "El nombre de la escuela debe tener al menos 2 caracteres.",
   }),
-  email: z.string().email(),
-  role: z.string(),
   active: z.boolean().default(true),
-})
+});
 
-export function UserForm() {
-  const form = useForm<z.infer<typeof userFormSchema>>({
-    resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      role: "viewer",
-      active: true,
-    },
-  })
+// 🔹 Tipo de formulario
+interface DynamicFormProps {
+  reloadData: () => void; // 🔹 Nueva función para recargar la lista de escuelas
+}
 
-  function onSubmit(values: z.infer<typeof userFormSchema>) {
-    console.log(values)
+export function DynamicForm({ reloadData }: DynamicFormProps) {
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof escuelaFormSchema>>({
+    resolver: zodResolver(escuelaFormSchema),
+    defaultValues: { name: "", active: true },
+  });
+
+  async function onSubmit(values: z.infer<typeof escuelaFormSchema>) {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/escuelas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        alert(`Error: ${data.error}`);
+      } else {
+        alert("✅ Escuela agregada exitosamente");
+        reloadData(); // 🔹 Recargar la lista de escuelas
+        form.reset(); // 🔹 Limpiar el formulario después de agregar
+      }
+    } catch (error) {
+      alert("❌ Hubo un problema al registrar la escuela");
+    }
+    setLoading(false);
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* 🔹 Campo Nombre */}
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Nombre</FormLabel>
+              <FormLabel className="text-sm font-medium">Nombre de Escuela</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Ingresar Nombre Completo" 
-                  className="border-[#D1D5DB]" 
-                  {...field} 
+                <Input
+                  placeholder="Ingresar Nombre de la Escuela"
+                  className="border-[#D1D5DB]"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium">Correo</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Ingresar email" 
-                  className="border-[#D1D5DB]" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium">Rol</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="border-[#D1D5DB]">
-                    <SelectValue placeholder="Escoger el Rol" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="editor">Editor</SelectItem>
-                  <SelectItem value="viewer">Viewer</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
+        {/* 🔹 Switch para estado activo/inactivo */}
         <FormField
           control={form.control}
           name="active"
@@ -123,14 +100,12 @@ export function UserForm() {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit"
-          className="bg-[#6366F1] hover:bg-[#4F46E5]"
-        >
-          Agregar
+
+        {/* 🔹 Botón de enviar */}
+        <Button type="submit" className="bg-[#6366F1] hover:bg-[#4F46E5]" disabled={loading}>
+          {loading ? "Agregando..." : "Agregar Escuela"}
         </Button>
       </form>
     </Form>
-  )
+  );
 }
-
