@@ -19,6 +19,7 @@ export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLEle
     { href: "razas", title: "Razas", icon: Bone },
     { href: "perros", title: "Perros", icon: Dog },
     { href: "parejas", title: "Parejas", icon: Users2 },
+    { href: "resultados", title: "Resultados", icon: Bone },
   ];
 
   return (

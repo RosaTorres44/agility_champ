@@ -17,18 +17,19 @@ export const dynamic = "force-dynamic";
 const TITLES: Record<string, string> = {
   usuarios: "Usuarios",
   escuelas: "Escuelas",
+  resultados: "Resultados",
 };
 
 function AdminContent() {
   const searchParams = useSearchParams();
-  const view = searchParams.get("view") || "usuarios";
+  const view = searchParams.get("view")?.toLowerCase() || "resultados"; // 🔹 Asegurar que `view` sea minúscula
   const pageTitle = TITLES[view] || "Administrar";
 
   const [escuelas, setEscuelas] = useState<{ id: string; name: string; active: boolean }[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  // 🔹 Función para obtener escuelas
+  // 🔹 Función para obtener escuelas (solo si estamos en la vista "escuelas")
   async function fetchEscuelas() {
     try {
       setLoading(true);

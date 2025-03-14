@@ -58,7 +58,7 @@ export function Nav({ className }: NavProps) {
                 Mi Desempeño
               </Link>
               <Link
-                href="/admin"
+                href="/admin?view=resultados"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
                   pathname === "/admin" ? "text-indigo-600" : "text-gray-500"
                 }`}
@@ -82,6 +82,5 @@ export function Nav({ className }: NavProps) {
     </nav>
   );
 }
-
 
 
