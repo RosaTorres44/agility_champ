@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const query = `
-select c.id_competencia, des_competencia , fec_inicio, e.des_escuela as Escuela, c.flg_activo
+select c.id_competencia, des_competencia nombre , fec_inicio, e.des_escuela as Escuela, c.flg_activo
 from competencia c inner join escuela e on c.id_escuela = e.id_escuela  order by c.flg_activo desc;
     `;
 

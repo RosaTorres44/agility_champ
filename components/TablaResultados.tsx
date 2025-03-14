@@ -16,23 +16,38 @@ export function TablaResultados({ guia, perro, competencia, pista }: TablaResult
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Simulación de datos de una API
+  // 🔹 Cargar resultados desde la API
   useEffect(() => {
     async function fetchRankings() {
       try {
         setLoading(true);
 
-        // 🔹 Datos de ejemplo (reemplazar con API real si es necesario)
-        const data = [
-          { competitionName: "Open Speed Runners", dogName: "Zoé", handlerName: "Rosita", grado: "Grado 1", categoria: "Pequeños", pista: "Pista Técnica", ranking: 1 },
-          { competitionName: "Open Speed Runners", dogName: "Hanna", handlerName: "Rosita", grado: "Grado 2", categoria: "Medianos", pista: "Pista Técnica", ranking: 3 },
-          { competitionName: "Agility Championship", dogName: "Maya", handlerName: "Mario", grado: "Grado 2", categoria: "Grandes", pista: "Pista Rápida", ranking: 2 },
-          { competitionName: "Agility Championship", dogName: "Bruno", handlerName: "Laura", grado: "Grado 3", categoria: "Medianos", pista: "Pista Técnica", ranking: 1 }
-        ];
+        const response = await fetch("/api/resultados");
+        if (!response.ok) {
+          throw new Error("Error al obtener los rankings");
+        }
 
-        setRankings(data);
-        setFilteredRankings(data); // Inicializa con todos los resultados
+        const data = await response.json();
 
+        // 🔹 Mapeamos los datos para asegurar consistencia con la tabla
+        const formattedData = data.map((item: any) => ({
+          competitionName: item.competitionName,
+          dogName: item.dogName,
+          handlerName: item.handlerName,
+          grado: item.grado,
+          categoria: item.categoria,
+          pista: item.pista,
+          rating: item.rating,
+          speed: item.speed,
+          faltas: item.faltas,
+          rehuses: item.rehuses,
+          num_penalizacion_recorrido: item.num_penalizacion_recorrido,
+          num_penalizacion_tiempo: item.num_penalizacion_tiempo,
+          num_total_penalizaciones: item.num_total_penalizaciones,
+        }));
+
+        setRankings(formattedData);
+        setFilteredRankings(formattedData);
       } catch (err) {
         setError("Error al obtener los rankings");
       } finally {
@@ -70,32 +85,48 @@ export function TablaResultados({ guia, perro, competencia, pista }: TablaResult
     <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
       <table className="w-full">
         <thead>
-          <tr className="border-b bg-gray-100">
-            <th className="text-left p-4">Competencia</th>
-            <th className="text-left p-4">Nombre Perro</th>
+            <tr className="border-b bg-gray-100">
             <th className="text-left p-4">Nombre Guía</th>
+            <th className="text-left p-4">Nombre Perro</th>
+            <th className="text-left p-4">Competencia</th>
+            <th className="text-left p-4">Pista</th>
             <th className="text-left p-4">Grado</th>
             <th className="text-left p-4">Categoría</th>
-            <th className="text-left p-4">Pista</th>
             <th className="text-left p-4">Ranking</th>
+            <th className="text-left p-4">Velocidad</th>
+            <th className="text-left p-4">Faltas</th>
+            <th className="text-left p-4">Rehuses</th>
+            <th className="text-left p-4">Penalizacion Recorrido</th>
+            <th className="text-left p-4">Penalizacion Tiempo</th>
+            <th className="text-left p-4">Penalizacion Total</th>
           </tr>
         </thead>
         <tbody>
           {filteredRankings.length > 0 ? (
             filteredRankings.map((ranking, index) => (
               <tr key={index} className="border-b">
-                <td className="p-4">{ranking.competitionName}</td>
-                <td className="p-4">{ranking.dogName}</td>
                 <td className="p-4">{ranking.handlerName}</td>
+                <td className="p-4">{ranking.dogName}</td>
+                <td className="p-4">{ranking.competitionName}</td>
+                <td className="p-4">{ranking.pista}</td>
                 <td className="p-4">{ranking.grado}</td>
                 <td className="p-4">{ranking.categoria}</td>
-                <td className="p-4">{ranking.pista}</td>
                 <td className="p-4 flex items-center gap-2">
-                  {ranking.ranking}
-                  {ranking.ranking === 1 && <Star className="text-yellow-500" />}
-                  {ranking.ranking === 2 && <Star className="text-gray-500" />}
-                  {ranking.ranking === 3 && <Star className="text-orange-500" />}
+                  {ranking.rating}
+                  {ranking.rating === 1 && <Star className="text-yellow-500" />}
+                  {ranking.rating === 2 && <Star className="text-gray-500" />}
+                  {ranking.rating === 3 && <Star className="text-orange-500" />}
                 </td>
+                <td className="p-4">{ranking.speed}</td>
+                <td className="p-4">{ranking.faltas}</td>
+                <td className="p-4">{ranking.rehuses}</td>
+                <td className="p-4">{ranking.num_penalizacion_recorrido}</td>
+                <td className="p-4">{ranking.num_penalizacion_tiempo}</td>
+                <td className="p-4">{ranking.num_total_penalizaciones}</td> 
+
+
+
+                
               </tr>
             ))
           ) : (

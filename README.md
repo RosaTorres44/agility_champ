@@ -5,6 +5,8 @@ npm install mysql2  --force
 npm install axios  --force
 npm install next react react-dom  --force
 npm install lucide-react
+npm install clsx
+
 
 npm install -g @railway/cli
 railway login --browserless

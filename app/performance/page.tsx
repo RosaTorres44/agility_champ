@@ -13,20 +13,20 @@ export const dynamic = "force-dynamic";
 export default function PerformancePage() {
   const [selectedGuia, setSelectedGuia] = useState("Guía");
   const [selectedPerro, setSelectedPerro] = useState("Perro");
-  const [selectedCompetencia, setSelectedCompetencia] = useState("Competencia");
+  const [selectedCompetencia, setSelectedCompetencia] = useState({ id: 0, nombre: "Competencia" });
   const [selectedPista, setSelectedPista] = useState("Pista");
 
   const [guias, setGuias] = useState<string[]>([]);
   const [perrosPorGuia, setPerrosPorGuia] = useState<Record<string, string[]>>({});
   const [perros, setPerros] = useState<string[]>([]);
-  const [competencias, setCompetencias] = useState<string[]>([]);
-  const [pistas, setPistas] = useState<string[]>([]);
+  const [competencias, setCompetencias] = useState<{ id: number; nombre: string }[]>([]);
+  const [pistas, setPistas] = useState<{ id: number; nombre: string }[]>([]);
 
   // 🔹 Cargar Guías desde la API
   useEffect(() => {
     async function loadGuias() {
       try {
-        const data = await fetchData("personas"); // 🔹 API corregida
+        const data = await fetchData("personas");
         const nombres = data.map((persona: { Nombre: string }) => persona.Nombre);
         setGuias(["Guía", ...nombres]);
       } catch (error) {
@@ -40,7 +40,7 @@ export default function PerformancePage() {
   useEffect(() => {
     async function loadPerros() {
       try {
-        const data = await fetchData("perros_por_guia"); // 🔹 API corregida
+        const data = await fetchData("perros_por_guia");
         setPerrosPorGuia(data);
       } catch (error) {
         console.error("Error cargando perros por guía:", error);
@@ -54,7 +54,10 @@ export default function PerformancePage() {
     async function loadCompetencias() {
       try {
         const data = await fetchData("competencias");
-        setCompetencias(["Competencia", ...data.map((comp: { nombre: string }) => comp.nombre)]);
+        setCompetencias([{ id: 0, nombre: "Competencia" }, ...data.map((comp: { id_competencia: number; nombre: string }) => ({
+          id: comp.id_competencia,
+          nombre: comp.nombre
+        }))]);
       } catch (error) {
         console.error("Error cargando competencias:", error);
       }
@@ -62,35 +65,44 @@ export default function PerformancePage() {
     loadCompetencias();
   }, []);
 
-  // 🔹 Cargar Pistas desde la API
+  // 🔹 Cargar Pistas cuando se selecciona una Competencia
   useEffect(() => {
     async function loadPistas() {
+      if (!selectedCompetencia || selectedCompetencia.id === 0) {
+        setPistas([{ id: 0, nombre: "Pista" }]); // Reseteamos pistas si no hay competencia
+        return;
+      }
+
       try {
-        const data = await fetchData("pistas");
-        setPistas(["Pista", ...data.map((pista: { nombre: string }) => pista.nombre)]);
+        const data = await fetchData(`pistas?competencia_id=${selectedCompetencia.id}`);
+        setPistas([{ id: 0, nombre: "Pista" }, ...data.map((pista: { id_pista: number; Nombre: string }) => ({
+          id: pista.id_pista,
+          nombre: pista.Nombre
+        }))]);
       } catch (error) {
         console.error("Error cargando pistas:", error);
       }
     }
+
     loadPistas();
-  }, []);
+  }, [selectedCompetencia]);
 
   // 🔹 Cargar perros cuando cambia la Guía seleccionada
   useEffect(() => {
     if (selectedGuia !== "Guía" && perrosPorGuia[selectedGuia]) {
-      setPerros(perrosPorGuia[selectedGuia]); // Carga los perros de la guía seleccionada
+      setPerros(["Perro", ...perrosPorGuia[selectedGuia]]);
     } else {
-      setPerros(["Perro"]); // Opción por defecto
+      setPerros(["Perro"]);
     }
     setSelectedPerro("Perro");
   }, [selectedGuia, perrosPorGuia]);
 
-  // 🔹 Cargar competencias cuando cambia el Perro seleccionado
+  // 🔹 Resetear competencia al cambiar de perro
   useEffect(() => {
-    setSelectedCompetencia("Competencia");
+    setSelectedCompetencia({ id: 0, nombre: "Competencia" });
   }, [selectedPerro]);
 
-  // 🔹 Cargar pistas cuando cambia la Competencia seleccionada
+  // 🔹 Resetear pista al cambiar de competencia
   useEffect(() => {
     setSelectedPista("Pista");
   }, [selectedCompetencia]);
@@ -101,31 +113,49 @@ export default function PerformancePage() {
       <Header_nav title="Mis Resultados" />
 
       {/* Sección de Filtros */}
-      <div className="flex p-4 gap-4">
-        <div className="w-1/4 bg-white p-4 rounded-lg shadow-md flex flex-col space-y-4">
-          <h2 className="text-lg font-semibold mb-2">Filtrar por:</h2>
-
-          {/* Filtros */}
-          <FiltroDropdown label="Guía" opciones={guias} selected={selectedGuia} setSelected={setSelectedGuia} />
-          {selectedGuia !== "Guía" && (
-            <FiltroDropdown label="Perro" opciones={perros} selected={selectedPerro} setSelected={setSelectedPerro} />
-          )}
-          {selectedPerro !== "Perro" && <FiltroDropdown label="Competencia" opciones={competencias} selected={selectedCompetencia} setSelected={setSelectedCompetencia} />}
-          {selectedCompetencia !== "Competencia" && <FiltroDropdown label="Pista" opciones={pistas} selected={selectedPista} setSelected={setSelectedPista} />}
-        </div>
+      <div className="flex p-4 gap-6">
+        <aside className="lg:w-1/5">
+          <div className="flex flex-col space-y-4">
+            {/* Filtros */}
+            <FiltroDropdown label="Guía" opciones={guias} selected={selectedGuia} setSelected={setSelectedGuia} />
+            {selectedGuia !== "Guía" && (
+              <FiltroDropdown label="Perro" opciones={perros} selected={selectedPerro} setSelected={setSelectedPerro} />
+            )}
+            {selectedPerro !== "Perro" && (
+              <FiltroDropdown
+                label="Competencia"
+                opciones={competencias.map((comp) => comp.nombre)}
+                selected={selectedCompetencia.nombre}
+                setSelected={(nombre) => {
+                  const compSeleccionada = competencias.find((comp) => comp.nombre === nombre);
+                  setSelectedCompetencia(compSeleccionada || { id: 0, nombre: "Competencia" });
+                }}
+              />
+            )}
+            {selectedCompetencia.id !== 0 && (
+              <FiltroDropdown
+                label="Pista"
+                opciones={pistas.map((pista) => pista.nombre)}
+                selected={selectedPista}
+                setSelected={setSelectedPista}
+              />
+            )}
+          </div>
+        </aside>
 
         {/* Resultados */}
-        <div className="w-3/4 bg-white p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold mb-2">Resultados</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md text-sm">
+          <h2 className="text-md font-semibold mb-3">Resultados</h2>
           <TablaResultados
             guia={selectedGuia === "Guía" ? null : selectedGuia}
             perro={selectedPerro === "Perro" ? null : selectedPerro}
-            competencia={selectedCompetencia === "Competencia" ? null : selectedCompetencia}
+            competencia={selectedCompetencia.id === 0 ? null : selectedCompetencia.nombre}
             pista={selectedPista === "Pista" ? null : selectedPista}
           />
         </div>
-      </div>
 
+
+      </div>
       <Pie />
     </main>
   );
@@ -135,7 +165,6 @@ export default function PerformancePage() {
 function FiltroDropdown({ label, opciones, selected, setSelected }: { label: string; opciones: string[]; selected: string; setSelected: (value: string) => void }) {
   return (
     <div className="flex flex-col">
-      <span className="text-gray-600 font-medium">{label}</span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className={`w-[250px] h-[45px] text-center truncate ${selected === label ? "font-bold" : ""}`}>
@@ -144,7 +173,7 @@ function FiltroDropdown({ label, opciones, selected, setSelected }: { label: str
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-[250px]">
           {opciones.map((opcion) => (
-            <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion)}>
+            <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion)} className="hover:bg-indigo-100 hover:text-indigo-700">
               {opcion}
             </DropdownMenuItem>
           ))}
@@ -162,6 +191,6 @@ async function fetchData(endpoint: string) {
     return response.json();
   } catch (error) {
     console.error(`Error en fetchData(${endpoint}):`, error);
-    return {};
+    return [];
   }
 }
