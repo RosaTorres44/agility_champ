@@ -1,15 +1,19 @@
 "use client"; // Esto fuerza que el componente sea renderizado en el cliente
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { usePathname } from 'next/navigation'; // Importa usePathname
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 
-export function Nav() {
-  const pathname = usePathname(); // Obtén la ruta actual
+interface NavProps {
+  className?: string; // ✅ Habilitar `className` como prop opcional
+}
+
+export function Nav({ className }: NavProps) {
+  const pathname = usePathname();
 
   return (
-    <nav className="border-b">
+    <nav className={`border-b ${className || ""}`}> {/* ✅ Agregar `className` aquí */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-8">
@@ -32,7 +36,7 @@ export function Nav() {
               <Link
                 href="/"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === '/' ? 'text-indigo-600' : 'text-gray-500'
+                  pathname === "/" ? "text-indigo-600" : "text-gray-500"
                 }`}
               >
                 Inicio
@@ -40,7 +44,7 @@ export function Nav() {
               <Link
                 href="/competitions"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === '/competitions' ? 'text-indigo-600' : 'text-gray-500'
+                  pathname === "/competitions" ? "text-indigo-600" : "text-gray-500"
                 }`}
               >
                 Competencias
@@ -48,7 +52,7 @@ export function Nav() {
               <Link
                 href="/performance"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === '/performance' ? 'text-indigo-600' : 'text-gray-500'
+                  pathname === "/performance" ? "text-indigo-600" : "text-gray-500"
                 }`}
               >
                 Mi Desempeño
@@ -56,7 +60,7 @@ export function Nav() {
               <Link
                 href="/admin"
                 className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === '/admin' ? 'text-indigo-600' : 'text-gray-500'
+                  pathname === "/admin" ? "text-indigo-600" : "text-gray-500"
                 }`}
               >
                 Administrar
@@ -78,3 +82,6 @@ export function Nav() {
     </nav>
   );
 }
+
+
+

@@ -4,13 +4,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const query = `
-      SELECT 
-        pe.des_nombres AS guia, 
-        p.des_nombres AS perro
-      FROM dupla D
-      INNER JOIN perro P ON D.id_perro = P.id_perro
-      INNER JOIN persona PE ON D.id_persona = PE.id_persona;
+    const query = ` 
+
+      select PE.des_nombres AS guia,  P.des_nombres AS perro  FROM dupla D iNNER JOIN perro P ON D.id_perro = P.id_perro INNER JOIN persona PE ON D.id_persona = PE.id_persona;
+
     `;
 
     console.log("Executing query:", query); // Depuración
