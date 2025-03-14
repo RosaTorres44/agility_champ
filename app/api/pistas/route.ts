@@ -23,7 +23,8 @@ export async function GET(req: Request) {
         persona.des_nombres AS juez, 
         pista.num_obstaculos AS obstaculos,
         pista.num_velocidad_maxima AS velocidad_max,
-        pista.num_velocidad_minima AS velocidad_min
+        pista.num_velocidad_minima AS velocidad_min, 
+        pista.flg_activo as active
       FROM pista pista 
       LEFT JOIN competencia competencia ON pista.id_competencia = competencia.id_competencia
       LEFT JOIN grado grado ON pista.id_grado = grado.id_grado

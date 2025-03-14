@@ -8,11 +8,12 @@ interface Entidad {
 }
 
 interface AdminTableSectionProps {
-  entidades: Entidad[];
-  dispatch: React.Dispatch<{ type: "EDIT_ENTITY"; payload: Entidad }>;
+  entityType: string;
+  entities: Entidad[];
+  dispatch: (action: { type: "EDIT_ENTITY"; payload: Entidad }) => void;
 }
 
-export function AdminTableSection({ entidades, dispatch }: AdminTableSectionProps) {
+export function AdminTableSection({ entityType, entities, dispatch }: AdminTableSectionProps) {
   return (
     <Tabs defaultValue="actives" className="space-y-4">
       <TabsList className="bg-transparent border-b border-[#E5E7EB] w-full justify-start h-auto p-0 space-x-6">
@@ -22,8 +23,9 @@ export function AdminTableSection({ entidades, dispatch }: AdminTableSectionProp
       {["actives", "inactives"].map((status) => (
         <TabsContent key={status} value={status}>
           <AdminMaestroTabla
-            users={entidades.filter(e => e.active === (status === "actives"))}
-            onEdit={(user) => dispatch({ type: "EDIT_ENTITY", payload: user })}
+            entityType={entityType}  
+            entities={entities.filter(e => e.active === (status === "actives"))}
+            onEdit={(entity) => dispatch({ type: "EDIT_ENTITY", payload: entity })}
           />
         </TabsContent>
       ))}

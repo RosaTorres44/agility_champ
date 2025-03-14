@@ -17,7 +17,13 @@ export function DropdownFilter({ label, endpoint, selectedOption, setSelectedOpt
 
   useEffect(() => {
     fetchData(endpoint, filter, competitionId)
-      .then(data => setOptions(data.map((item: { Nombre: string }) => item.Nombre)))
+      .then(data => {
+        // 🔹 Filtrar solo los elementos con `active = 1`
+        const filteredOptions = data
+          .filter((item: { active: number }) => item.active === 1)
+          .map((item: { Nombre: string }) => item.Nombre);
+        setOptions(filteredOptions);
+      })
       .catch(error => console.error(`Error al cargar ${label.toLowerCase()}:`, error));
   }, [endpoint, label, filter, competitionId]);
 
@@ -40,6 +46,7 @@ export function DropdownFilter({ label, endpoint, selectedOption, setSelectedOpt
   );
 }
 
+// 🔹 Función para obtener datos filtrados
 async function fetchData(endpoint: string, filter?: "active" | "all", competitionId?: number | null) {
   let url = `/api/${endpoint}`;
 
@@ -50,9 +57,14 @@ async function fetchData(endpoint: string, filter?: "active" | "all", competitio
 
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Error al obtener los datos de ${endpoint}`);
-  return response.json();
+
+  const data = await response.json();
+
+  // 🔹 Filtrar `active = 1` para categorías y grados
+  return data.filter((item: { active: number }) => item.active === 1);
 }
 
+// 🔹 Función para obtener la ID de la competencia activa
 async function getActiveCompetitionId() {
   try {
     const response = await fetch("/api/competencias");

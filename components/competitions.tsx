@@ -29,7 +29,7 @@ export function Competitions({ filter = "all" }: CompetitionsProps) {
 
         const formattedData = data.map((item: any) => ({
           id: item.id_competencia,
-          title: item.des_competencia,
+          title: item.nombre,
           date: new Date(item.fec_inicio).toLocaleDateString("en-US"),
           escuela: item.Escuela,
           status: item.flg_activo === 1 ? "En Curso" :

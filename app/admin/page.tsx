@@ -15,7 +15,8 @@ export const dynamic = "force-dynamic";
 // 🔹 Diccionario de títulos por vista
 const TITLES: Record<string, string> = {
   escuelas: "Escuelas",
-  categorias: "Categorías",
+  categorias: "Categorias",
+  competencias: "Competencias",
   grados: "Grados",
   usuarios: "Usuarios",
   resultados: "Resultados",
@@ -28,28 +29,24 @@ interface Entidad {
   active: boolean;
 }
 
-// 🔹 Definir tipos para el reducer
-type AdminState = {
-  showForm: boolean;
-  selectedUser: Entidad | null;
-};
+// 🔹 Reducer para manejar el estado del formulario y entidad seleccionada
+type AdminState = { showForm: boolean; selectedEntity: Entidad | null };
 
 type AdminAction =
   | { type: "EDIT_ENTITY"; payload: Entidad }
   | { type: "NEW_ENTITY" }
   | { type: "CLOSE_FORM" };
 
-// 🔹 Reducer para manejar el estado del formulario y usuario seleccionado
-const initialState: AdminState = { showForm: false, selectedUser: null };
+const initialState: AdminState = { showForm: false, selectedEntity: null };
 
 function reducer(state: AdminState, action: AdminAction): AdminState {
   switch (action.type) {
     case "EDIT_ENTITY":
-      return { showForm: true, selectedUser: action.payload };
+      return { showForm: true, selectedEntity: action.payload };
     case "NEW_ENTITY":
-      return { showForm: true, selectedUser: null };
+      return { showForm: true, selectedEntity: null };
     case "CLOSE_FORM":
-      return { showForm: false, selectedUser: null }; // ✅ Restablecer también `selectedUser`
+      return { showForm: false, selectedEntity: null };
     default:
       return state;
   }
@@ -57,18 +54,18 @@ function reducer(state: AdminState, action: AdminAction): AdminState {
 
 function AdminContent() {
   const searchParams = useSearchParams();
-  const view = searchParams.get("view")?.toLowerCase() || "resultados";
-  const pageTitle = TITLES[view] || "Administrar";
+  const entityType = searchParams.get("view")?.toLowerCase() || "resultados";
+  const pageTitle = TITLES[entityType] || "Administrar";
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [escuelas, setEscuelas] = useState<Entidad[]>([]);
+  const [entities, setEntities] = useState<Entidad[]>([]);
 
-  // 🔹 Función optimizada para obtener escuelas
-  const fetchEscuelas = useCallback(async () => {
+  // 🔹 Función para obtener datos dinámicamente según la entidad seleccionada
+  const fetchEntities = useCallback(async () => {
     try {
-      const response = await fetch("/api/escuelas");
-      if (!response.ok) throw new Error("Error al obtener las escuelas");
+      const response = await fetch(`/api/${entityType}`);
+      if (!response.ok) throw new Error(`Error al obtener ${entityType}`);
       const data = await response.json();
-      setEscuelas(
+      setEntities(
         data.map((e: { id: number; name: string; active: number }) => ({
           id: e.id,
           name: e.name,
@@ -76,13 +73,13 @@ function AdminContent() {
         }))
       );
     } catch (err) {
-      console.error("Error al obtener las escuelas:", err);
+      console.error(`Error al obtener ${entityType}:`, err);
     }
-  }, []);
+  }, [entityType]);
 
   useEffect(() => {
-    if (view === "escuelas") fetchEscuelas();
-  }, [view, fetchEscuelas]);
+    fetchEntities();
+  }, [entityType, fetchEntities]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -103,12 +100,15 @@ function AdminContent() {
             </div>
             {state.showForm && (
               <DynamicForm
-                reloadData={fetchEscuelas}
-                selectedUser={state.selectedUser}
+                entityType={pageTitle} // ✅ Se pasa el tipo de entidad correctamente
+                reloadData={fetchEntities}
+                selectedEntity={state.selectedEntity}
                 onCancel={() => dispatch({ type: "CLOSE_FORM" })}
               />
             )}
-            <AdminTableSection entidades={escuelas} dispatch={dispatch} />
+           <AdminTableSection entityType={pageTitle} entities={entities} dispatch={dispatch} />
+
+
           </div>
         </div>
       </div>

@@ -10,44 +10,45 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { RotateCw } from "lucide-react"; // 🔹 Importa el icono de actualización
+import { Pencil } from "lucide-react"; // 🔹 Se usa un ícono de actualización
 
-interface User {
+interface Entidad {
   id: number;
   name: string;
   active: boolean;
 }
 
 interface TableProps {
-  users: User[];
-  onEdit: (user: User) => void;
+  entityType: string; // ✅ Se pasa el tipo de entidad
+  entities: Entidad[];
+  onEdit: (entity: Entidad) => void;
 }
 
-export function AdminMaestroTabla({ users, onEdit }: TableProps) {
+export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) {
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow className="bg-[#F9FAFB]">
             <TableHead className="w-[50px] font-medium">Activo</TableHead>
-            <TableHead className="font-medium">Nombre</TableHead>
+            <TableHead className="font-medium">{entityType}</TableHead> {/* ✅ Dinámico */}
             <TableHead className="w-[80px] font-medium">Actualizar</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.length > 0 ? (
-            users.map((user) => (
-              <TableRow key={user.id}>
+          {entities.length > 0 ? (
+            entities.map((entity) => (
+              <TableRow key={entity.id}>
                 <TableCell>
-                  <Checkbox checked={user.active} className="border-[#D1D5DB]" />
+                  <Checkbox checked={entity.active} className="border-[#D1D5DB]" />
                 </TableCell>
-                <TableCell>{user.name}</TableCell>
+                <TableCell>{entity.name}</TableCell>
                 <TableCell>
                   <Button
-                    className="bg-[#6366F1] hover:bg-[#4F46E5] flex items-center justify-center"
-                    onClick={() => onEdit(user)}
+                    className="bg-[#6366F1] hover:bg-[#4F46E5]"
+                    onClick={() => onEdit(entity)}
                   >
-                    <RotateCw className="w-4 h-4 text-white" /> {/* 🔹 Nuevo icono de actualización */}
+                    <Pencil className="w-4 h-4 text-white" /> {/* 🔹 Ícono de editar */}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -55,7 +56,7 @@ export function AdminMaestroTabla({ users, onEdit }: TableProps) {
           ) : (
             <TableRow>
               <TableCell colSpan={3} className="text-center text-gray-500 py-4">
-                No hay escuelas registradas.
+                No hay registros en {entityType}.
               </TableCell>
             </TableRow>
           )}
