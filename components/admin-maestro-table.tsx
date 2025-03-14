@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { RotateCw } from "lucide-react"; // 🔹 Importa el icono de actualización
 
 interface User {
   id: number;
@@ -44,8 +43,11 @@ export function AdminMaestroTabla({ users, onEdit }: TableProps) {
                 </TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>
-                  <Button className="bg-[#6366F1] hover:bg-[#4F46E5]" onClick={() => onEdit(user)}>
-                    <MoreHorizontal className="w-4 h-4 text-white" />
+                  <Button
+                    className="bg-[#6366F1] hover:bg-[#4F46E5] flex items-center justify-center"
+                    onClick={() => onEdit(user)}
+                  >
+                    <RotateCw className="w-4 h-4 text-white" /> {/* 🔹 Nuevo icono de actualización */}
                   </Button>
                 </TableCell>
               </TableRow>

@@ -14,13 +14,15 @@ export const dynamic = "force-dynamic";
 
 // 🔹 Diccionario de títulos por vista
 const TITLES: Record<string, string> = {
-  usuarios: "Usuarios",
   escuelas: "Escuelas",
+  categorias: "Categorías",
+  grados: "Grados",
+  usuarios: "Usuarios",
   resultados: "Resultados",
 };
 
-// 🔹 Definir el tipo para una escuela
-interface Escuela {
+// 🔹 Definir el tipo para una entidad
+interface Entidad {
   id: number;
   name: string;
   active: boolean;
@@ -29,12 +31,12 @@ interface Escuela {
 // 🔹 Definir tipos para el reducer
 type AdminState = {
   showForm: boolean;
-  selectedUser: Escuela | null;
+  selectedUser: Entidad | null;
 };
 
 type AdminAction =
-  | { type: "EDIT_USER"; payload: Escuela }
-  | { type: "NEW_USER" }
+  | { type: "EDIT_ENTITY"; payload: Entidad }
+  | { type: "NEW_ENTITY" }
   | { type: "CLOSE_FORM" };
 
 // 🔹 Reducer para manejar el estado del formulario y usuario seleccionado
@@ -42,9 +44,9 @@ const initialState: AdminState = { showForm: false, selectedUser: null };
 
 function reducer(state: AdminState, action: AdminAction): AdminState {
   switch (action.type) {
-    case "EDIT_USER":
+    case "EDIT_ENTITY":
       return { showForm: true, selectedUser: action.payload };
-    case "NEW_USER":
+    case "NEW_ENTITY":
       return { showForm: true, selectedUser: null };
     case "CLOSE_FORM":
       return { showForm: false, selectedUser: null }; // ✅ Restablecer también `selectedUser`
@@ -58,7 +60,7 @@ function AdminContent() {
   const view = searchParams.get("view")?.toLowerCase() || "resultados";
   const pageTitle = TITLES[view] || "Administrar";
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [escuelas, setEscuelas] = useState<Escuela[]>([]);
+  const [escuelas, setEscuelas] = useState<Entidad[]>([]);
 
   // 🔹 Función optimizada para obtener escuelas
   const fetchEscuelas = useCallback(async () => {
@@ -94,7 +96,7 @@ function AdminContent() {
               <h1 className="text-2xl font-bold tracking-tight">{pageTitle}</h1>
               <Button
                 className="bg-[#6366F1] hover:bg-[#4F46E5]"
-                onClick={() => dispatch(state.showForm ? { type: "CLOSE_FORM" } : { type: "NEW_USER" })}
+                onClick={() => dispatch(state.showForm ? { type: "CLOSE_FORM" } : { type: "NEW_ENTITY" })}
               >
                 {state.showForm ? "Cancelar" : `Agregar Nueva ${pageTitle}`}
               </Button>
@@ -106,7 +108,7 @@ function AdminContent() {
                 onCancel={() => dispatch({ type: "CLOSE_FORM" })}
               />
             )}
-            <AdminTableSection escuelas={escuelas} dispatch={dispatch} />
+            <AdminTableSection entidades={escuelas} dispatch={dispatch} />
           </div>
         </div>
       </div>

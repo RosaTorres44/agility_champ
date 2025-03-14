@@ -13,6 +13,8 @@ export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLEle
   // Definimos las secciones del menú
   const navItems = [
     { href: "escuelas", title: "Escuelas", icon: School },
+    { href: "categorias", title: "Categorias", icon: School },
+    { href: "grados", title: "Grados", icon: School },
     { href: "competencias", title: "Competencias", icon: Trophy },
     { href: "pistas", title: "Pistas", icon: MapPin },
     { href: "usuarios", title: "Usuarios", icon: Users },
