@@ -18,6 +18,7 @@ const TITLES: Record<string, string> = {
   categorias: "Categorias",
   competencias: "Competencias",
   grados: "Grados",
+  razas: "Razas",
   usuarios: "Usuarios",
   resultados: "Resultados",
 };

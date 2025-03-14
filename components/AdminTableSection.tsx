@@ -3,14 +3,14 @@ import { AdminMaestroTabla } from "@/components/admin-maestro-table";
 
 interface Entidad {
   id: number;
-  name: string;
   active: boolean;
+  [key: string]: any; // 🔹 Permite cualquier otra propiedad sin romper el tipado
 }
 
 interface AdminTableSectionProps {
   entityType: string;
   entities: Entidad[];
-  dispatch: (action: { type: "EDIT_ENTITY"; payload: Entidad }) => void;
+  dispatch: React.Dispatch<{ type: "EDIT_ENTITY"; payload: Entidad }>;
 }
 
 export function AdminTableSection({ entityType, entities, dispatch }: AdminTableSectionProps) {
