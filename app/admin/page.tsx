@@ -1,68 +1,91 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useEffect, useCallback, useReducer, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SidebarNav } from "@/components/sidebar-nav";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Nav } from "@/components/nav";
 import { Header_nav } from "@/components/header_nav";
 import { Pie } from "@/components/Pie";
-import { AdminMaestroTabla } from "@/components/admin-maestro-table";
+import { AdminTableSection } from "@/components/AdminTableSection";
 import { DynamicForm } from "@/components/admin-maestro-form";
 
 export const dynamic = "force-dynamic";
 
-// 🔹 Definir títulos dinámicos según `view`
+// 🔹 Diccionario de títulos por vista
 const TITLES: Record<string, string> = {
   usuarios: "Usuarios",
   escuelas: "Escuelas",
   resultados: "Resultados",
 };
 
+// 🔹 Definir el tipo para una escuela
+interface Escuela {
+  id: number;
+  name: string;
+  active: boolean;
+}
+
+// 🔹 Definir tipos para el reducer
+type AdminState = {
+  showForm: boolean;
+  selectedUser: Escuela | null;
+};
+
+type AdminAction =
+  | { type: "EDIT_USER"; payload: Escuela }
+  | { type: "NEW_USER" }
+  | { type: "CLOSE_FORM" };
+
+// 🔹 Reducer para manejar el estado del formulario y usuario seleccionado
+const initialState: AdminState = { showForm: false, selectedUser: null };
+
+function reducer(state: AdminState, action: AdminAction): AdminState {
+  switch (action.type) {
+    case "EDIT_USER":
+      return { showForm: true, selectedUser: action.payload };
+    case "NEW_USER":
+      return { showForm: true, selectedUser: null };
+    case "CLOSE_FORM":
+      return { showForm: false, selectedUser: null }; // ✅ Restablecer también `selectedUser`
+    default:
+      return state;
+  }
+}
+
 function AdminContent() {
   const searchParams = useSearchParams();
   const view = searchParams.get("view")?.toLowerCase() || "resultados";
   const pageTitle = TITLES[view] || "Administrar";
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [escuelas, setEscuelas] = useState<Escuela[]>([]);
 
-  const [escuelas, setEscuelas] = useState<{ id: number; name: string; active: boolean }[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<{ id: number; name: string; active: boolean } | null>(null);
-
-  async function fetchEscuelas() {
+  // 🔹 Función optimizada para obtener escuelas
+  const fetchEscuelas = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await fetch("/api/escuelas");
       if (!response.ok) throw new Error("Error al obtener las escuelas");
-
       const data = await response.json();
-
-      // 🔹 Convertir datos correctamente
-      const formattedEscuelas = data.map((escuela: { id: number; name: string; active: number }) => ({
-        id: escuela.id,
-        name: escuela.name,
-        active: Boolean(escuela.active), // Convertir a booleano
-      }));
-
-      setEscuelas(formattedEscuelas);
+      setEscuelas(
+        data.map((e: { id: number; name: string; active: number }) => ({
+          id: e.id,
+          name: e.name,
+          active: Boolean(e.active),
+        }))
+      );
     } catch (err) {
       console.error("Error al obtener las escuelas:", err);
-    } finally {
-      setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    if (view === "escuelas") {
-      fetchEscuelas();
-    }
-  }, [view]);
+    if (view === "escuelas") fetchEscuelas();
+  }, [view, fetchEscuelas]);
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="hidden space-y-6 p-10 pb-16 md:block">
-        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12">
           <aside className="-mx-4 lg:w-1/5">
             <SidebarNav />
           </aside>
@@ -71,39 +94,19 @@ function AdminContent() {
               <h1 className="text-2xl font-bold tracking-tight">{pageTitle}</h1>
               <Button
                 className="bg-[#6366F1] hover:bg-[#4F46E5]"
-                onClick={() => {
-                  setSelectedUser(null);
-                  setShowForm(true);
-                }}
+                onClick={() => dispatch(state.showForm ? { type: "CLOSE_FORM" } : { type: "NEW_USER" })}
               >
-                {showForm && !selectedUser ? "Cancelar" : `Agregar Nueva ${pageTitle}`}
+                {state.showForm ? "Cancelar" : `Agregar Nueva ${pageTitle}`}
               </Button>
             </div>
-            {showForm && <DynamicForm reloadData={fetchEscuelas} selectedUser={selectedUser} />}
-            <Tabs defaultValue="actives" className="space-y-4">
-              <TabsList className="bg-transparent border-b border-[#E5E7EB] w-full justify-start h-auto p-0 space-x-6">
-                <TabsTrigger value="actives">Activas</TabsTrigger>
-                <TabsTrigger value="inactives">Inactivas</TabsTrigger>
-              </TabsList>
-              <TabsContent value="actives">
-                <AdminMaestroTabla 
-                  users={escuelas.filter((e) => e.active)} 
-                  onEdit={(user) => {
-                    setSelectedUser(user);
-                    setShowForm(true);
-                  }} 
-                />
-              </TabsContent>
-              <TabsContent value="inactives">
-                <AdminMaestroTabla 
-                  users={escuelas.filter((e) => !e.active)} 
-                  onEdit={(user) => {
-                    setSelectedUser(user);
-                    setShowForm(true);
-                  }} 
-                />
-              </TabsContent>
-            </Tabs>
+            {state.showForm && (
+              <DynamicForm
+                reloadData={fetchEscuelas}
+                selectedUser={state.selectedUser}
+                onCancel={() => dispatch({ type: "CLOSE_FORM" })}
+              />
+            )}
+            <AdminTableSection escuelas={escuelas} dispatch={dispatch} />
           </div>
         </div>
       </div>

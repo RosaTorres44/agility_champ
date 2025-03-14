@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header_nav } from "@/components/header_nav";
 import { Nav } from "@/components/nav";
 import { Pie } from "@/components/Pie";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { TablaResultados } from "@/components/TablaResultados";
+import { FiltrosResultados } from "@/components/FiltrosResultados";
 
 export const dynamic = "force-dynamic";
 
@@ -16,93 +15,64 @@ export default function PerformancePage() {
   const [selectedCompetencia, setSelectedCompetencia] = useState({ id: 0, nombre: "Competencia" });
   const [selectedPista, setSelectedPista] = useState("Pista");
 
-  const [guias, setGuias] = useState<string[]>([]);
+  const [guias, setGuias] = useState<string[]>(["Guía"]);
   const [perrosPorGuia, setPerrosPorGuia] = useState<Record<string, string[]>>({});
-  const [perros, setPerros] = useState<string[]>([]);
-  const [competencias, setCompetencias] = useState<{ id: number; nombre: string }[]>([]);
-  const [pistas, setPistas] = useState<{ id: number; nombre: string }[]>([]);
+  const [perros, setPerros] = useState<string[]>(["Perro"]);
+  const [competencias, setCompetencias] = useState<{ id: number; nombre: string }[]>([{ id: 0, nombre: "Competencia" }]);
+  const [pistas, setPistas] = useState<{ id: number; nombre: string }[]>([{ id: 0, nombre: "Pista" }]);
 
-  // 🔹 Cargar Guías desde la API
-  useEffect(() => {
-    async function loadGuias() {
-      try {
-        const data = await fetchData("personas");
-        const nombres = data.map((persona: { Nombre: string }) => persona.Nombre);
-        setGuias(["Guía", ...nombres]);
-      } catch (error) {
-        console.error("Error cargando guías:", error);
-      }
+  // 🔹 Cargar datos desde la API
+  const fetchData = useCallback(async (endpoint: string) => {
+    try {
+      const response = await fetch(`/api/${endpoint}`);
+      if (!response.ok) throw new Error(`Error al obtener datos de ${endpoint}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error en fetchData(${endpoint}):`, error);
+      return [];
     }
-    loadGuias();
   }, []);
 
-  // 🔹 Cargar Perros por Guía desde la API
   useEffect(() => {
-    async function loadPerros() {
-      try {
-        const data = await fetchData("perros_por_guia");
-        setPerrosPorGuia(data);
-      } catch (error) {
-        console.error("Error cargando perros por guía:", error);
-      }
-    }
-    loadPerros();
-  }, []);
+    (async () => {
+      const [guiasData, perrosData, competenciasData] = await Promise.all([
+        fetchData("personas"),
+        fetchData("perros_por_guia"),
+        fetchData("competencias"),
+      ]);
 
-  // 🔹 Cargar Competencias desde la API
+      setGuias(["Guía", ...guiasData.map((persona: { Nombre: string }) => persona.Nombre)]);
+      setPerrosPorGuia(perrosData);
+      setCompetencias([{ id: 0, nombre: "Competencia" }, ...competenciasData.map((comp: { id_competencia: number; nombre: string }) => ({
+        id: comp.id_competencia,
+        nombre: comp.nombre
+      }))]);
+    })();
+  }, [fetchData]);
+
   useEffect(() => {
-    async function loadCompetencias() {
-      try {
-        const data = await fetchData("competencias");
-        setCompetencias([{ id: 0, nombre: "Competencia" }, ...data.map((comp: { id_competencia: number; nombre: string }) => ({
-          id: comp.id_competencia,
-          nombre: comp.nombre
-        }))]);
-      } catch (error) {
-        console.error("Error cargando competencias:", error);
-      }
-    }
-    loadCompetencias();
-  }, []);
-
-  // 🔹 Cargar Pistas cuando se selecciona una Competencia
-  useEffect(() => {
-    async function loadPistas() {
-      if (!selectedCompetencia || selectedCompetencia.id === 0) {
-        setPistas([{ id: 0, nombre: "Pista" }]); // Reseteamos pistas si no hay competencia
-        return;
-      }
-
-      try {
-        const data = await fetchData(`pistas?competencia_id=${selectedCompetencia.id}`);
-        setPistas([{ id: 0, nombre: "Pista" }, ...data.map((pista: { id_pista: number; Nombre: string }) => ({
-          id: pista.id_pista,
-          nombre: pista.Nombre
-        }))]);
-      } catch (error) {
-        console.error("Error cargando pistas:", error);
-      }
-    }
-
-    loadPistas();
-  }, [selectedCompetencia]);
-
-  // 🔹 Cargar perros cuando cambia la Guía seleccionada
-  useEffect(() => {
-    if (selectedGuia !== "Guía" && perrosPorGuia[selectedGuia]) {
-      setPerros(["Perro", ...perrosPorGuia[selectedGuia]]);
-    } else {
-      setPerros(["Perro"]);
-    }
+    setPerros(["Perro", ...(perrosPorGuia[selectedGuia] || [])]);
     setSelectedPerro("Perro");
   }, [selectedGuia, perrosPorGuia]);
 
-  // 🔹 Resetear competencia al cambiar de perro
   useEffect(() => {
     setSelectedCompetencia({ id: 0, nombre: "Competencia" });
   }, [selectedPerro]);
 
-  // 🔹 Resetear pista al cambiar de competencia
+  useEffect(() => {
+    if (selectedCompetencia.id === 0) {
+      setPistas([{ id: 0, nombre: "Pista" }]);
+    } else {
+      (async () => {
+        const pistasData = await fetchData(`pistas?competencia_id=${selectedCompetencia.id}`);
+        setPistas([{ id: 0, nombre: "Pista" }, ...pistasData.map((pista: { id_pista: number; Nombre: string }) => ({
+          id: pista.id_pista,
+          nombre: pista.Nombre
+        }))]);
+      })();
+    }
+  }, [selectedCompetencia, fetchData]);
+
   useEffect(() => {
     setSelectedPista("Pista");
   }, [selectedCompetencia]);
@@ -111,40 +81,17 @@ export default function PerformancePage() {
     <main className="min-h-screen bg-white">
       <Nav />
       <Header_nav title="Mis Resultados" />
-
-      {/* Sección de Filtros */}
       <div className="flex p-4 gap-6">
         <aside className="lg:w-1/5">
-          <div className="flex flex-col space-y-4">
-            {/* Filtros */}
-            <FiltroDropdown label="Guía" opciones={guias} selected={selectedGuia} setSelected={setSelectedGuia} />
-            {selectedGuia !== "Guía" && (
-              <FiltroDropdown label="Perro" opciones={perros} selected={selectedPerro} setSelected={setSelectedPerro} />
-            )}
-            {selectedPerro !== "Perro" && (
-              <FiltroDropdown
-                label="Competencia"
-                opciones={competencias.map((comp) => comp.nombre)}
-                selected={selectedCompetencia.nombre}
-                setSelected={(nombre) => {
-                  const compSeleccionada = competencias.find((comp) => comp.nombre === nombre);
-                  setSelectedCompetencia(compSeleccionada || { id: 0, nombre: "Competencia" });
-                }}
-              />
-            )}
-            {selectedCompetencia.id !== 0 && (
-              <FiltroDropdown
-                label="Pista"
-                opciones={pistas.map((pista) => pista.nombre)}
-                selected={selectedPista}
-                setSelected={setSelectedPista}
-              />
-            )}
-          </div>
+          <FiltrosResultados
+            guias={guias} perros={perros} competencias={competencias} pistas={pistas}
+            selectedGuia={selectedGuia} setSelectedGuia={setSelectedGuia}
+            selectedPerro={selectedPerro} setSelectedPerro={setSelectedPerro}
+            selectedCompetencia={selectedCompetencia} setSelectedCompetencia={setSelectedCompetencia}
+            selectedPista={selectedPista} setSelectedPista={setSelectedPista}
+          />
         </aside>
-
-        {/* Resultados */}
-        <div className="bg-white p-6 rounded-lg shadow-md text-sm">
+        <div className="bg-white p-6 rounded-lg shadow-md text-sm flex-1">
           <h2 className="text-md font-semibold mb-3">Resultados</h2>
           <TablaResultados
             guia={selectedGuia === "Guía" ? null : selectedGuia}
@@ -153,44 +100,8 @@ export default function PerformancePage() {
             pista={selectedPista === "Pista" ? null : selectedPista}
           />
         </div>
-
-
       </div>
       <Pie />
     </main>
   );
-}
-
-/** 🔹 Componente reutilizable para los filtros */
-function FiltroDropdown({ label, opciones, selected, setSelected }: { label: string; opciones: string[]; selected: string; setSelected: (value: string) => void }) {
-  return (
-    <div className="flex flex-col">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className={`w-[250px] h-[45px] text-center truncate ${selected === label ? "font-bold" : ""}`}>
-            {selected}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[250px]">
-          {opciones.map((opcion) => (
-            <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion)} className="hover:bg-indigo-100 hover:text-indigo-700">
-              {opcion}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-}
-
-/** 🔹 Función para obtener datos de la API */
-async function fetchData(endpoint: string) {
-  try {
-    const response = await fetch(`/api/${endpoint}`);
-    if (!response.ok) throw new Error(`Error al obtener los datos de ${endpoint}`);
-    return response.json();
-  } catch (error) {
-    console.error(`Error en fetchData(${endpoint}):`, error);
-    return [];
-  }
 }
