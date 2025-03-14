@@ -3,14 +3,20 @@ import { AdminMaestroTabla } from "@/components/admin-maestro-table";
 
 interface Entidad {
   id: number;
+  name: string;
   active: boolean;
-  [key: string]: any; // 🔹 Permite cualquier otra propiedad sin romper el tipado
 }
+
+// 🔹 Definir el tipo de acción que `dispatch` puede recibir
+type AdminAction =
+  | { type: "EDIT_ENTITY"; payload: Entidad }
+  | { type: "NEW_ENTITY" }
+  | { type: "CLOSE_FORM" };
 
 interface AdminTableSectionProps {
   entityType: string;
   entities: Entidad[];
-  dispatch: React.Dispatch<{ type: "EDIT_ENTITY"; payload: Entidad }>;
+  dispatch: React.Dispatch<AdminAction>; // ✅ Ahora `dispatch` tiene el tipo correcto
 }
 
 export function AdminTableSection({ entityType, entities, dispatch }: AdminTableSectionProps) {

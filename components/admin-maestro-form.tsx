@@ -109,7 +109,6 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
             <Button
             type="submit"
             className="bg-[#6366F1] hover:bg-[#4F46E5]"
-            onClick={() => alert(JSON.stringify(form.getValues(), null, 2))}
             >
             {selectedEntity ? `Actualizar ${entityType}` : `Agregar ${entityType}`}
             </Button>
