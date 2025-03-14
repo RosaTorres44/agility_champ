@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,44 +14,56 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 
-// 🔹 Definir esquema para escuela
 const escuelaFormSchema = z.object({
   name: z.string().min(2, {
     message: "El nombre de la escuela debe tener al menos 2 caracteres.",
   }),
-  active: z.boolean().default(true),
+  active: z.boolean(),
 });
 
-// 🔹 Tipo de formulario
 interface DynamicFormProps {
-  reloadData: () => void; // 🔹 Nueva función para recargar la lista de escuelas
+  reloadData: () => void;
+  selectedUser?: { id: number; name: string; active: boolean | number } | null;
 }
 
-export function DynamicForm({ reloadData }: DynamicFormProps) {
+export function DynamicForm({ reloadData, selectedUser }: DynamicFormProps) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof escuelaFormSchema>>({
     resolver: zodResolver(escuelaFormSchema),
-    defaultValues: { name: "", active: true },
+    defaultValues: {
+      name: selectedUser?.name || "",
+      active: Boolean(selectedUser?.active), // Asegurar que active sea booleano
+    },
   });
+
+  useEffect(() => {
+    form.reset({
+      name: selectedUser?.name || "",
+      active: Boolean(selectedUser?.active),
+    });
+  }, [selectedUser, form]);
 
   async function onSubmit(values: z.infer<typeof escuelaFormSchema>) {
     setLoading(true);
     try {
+      const method = selectedUser ? "PUT" : "POST";
+      const body = selectedUser ? { id: selectedUser.id, ...values } : values;
+
       const response = await fetch("/api/escuelas", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (data.error) {
-        alert(`Error: ${data.error}`);
+        alert(`❌ Error: ${data.error}`);
       } else {
-        alert("✅ Escuela agregada exitosamente");
-        reloadData(); // 🔹 Recargar la lista de escuelas
-        form.reset(); // 🔹 Limpiar el formulario después de agregar
+        alert(selectedUser ? "✅ Escuela actualizada exitosamente" : "✅ Escuela agregada exitosamente");
+        reloadData();
+        form.reset({ name: "", active: true });
       }
     } catch (error) {
       alert("❌ Hubo un problema al registrar la escuela");
@@ -62,7 +74,6 @@ export function DynamicForm({ reloadData }: DynamicFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* 🔹 Campo Nombre */}
         <FormField
           control={form.control}
           name="name"
@@ -70,29 +81,22 @@ export function DynamicForm({ reloadData }: DynamicFormProps) {
             <FormItem>
               <FormLabel className="text-sm font-medium">Nombre de Escuela</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Ingresar Nombre de la Escuela"
-                  className="border-[#D1D5DB]"
-                  {...field}
-                />
+                <Input placeholder="Ingresar Nombre de la Escuela" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* 🔹 Switch para estado activo/inactivo */}
         <FormField
           control={form.control}
           name="active"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#D1D5DB] p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Activo</FormLabel>
-              </div>
+              <FormLabel className="text-base">Activo</FormLabel>
               <FormControl>
                 <Switch
-                  checked={field.value}
+                  checked={field.value === true}
                   onCheckedChange={field.onChange}
                   className="data-[state=checked]:bg-[#6366F1]"
                 />
@@ -101,9 +105,8 @@ export function DynamicForm({ reloadData }: DynamicFormProps) {
           )}
         />
 
-        {/* 🔹 Botón de enviar */}
         <Button type="submit" className="bg-[#6366F1] hover:bg-[#4F46E5]" disabled={loading}>
-          {loading ? "Agregando..." : "Agregar Escuela"}
+          {loading ? "Guardando..." : selectedUser ? "Actualizar Escuela" : "Agregar Escuela"}
         </Button>
       </form>
     </Form>

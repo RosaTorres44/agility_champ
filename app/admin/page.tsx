@@ -22,14 +22,14 @@ const TITLES: Record<string, string> = {
 
 function AdminContent() {
   const searchParams = useSearchParams();
-  const view = searchParams.get("view")?.toLowerCase() || "resultados"; // 🔹 Asegurar que `view` sea minúscula
+  const view = searchParams.get("view")?.toLowerCase() || "resultados";
   const pageTitle = TITLES[view] || "Administrar";
 
-  const [escuelas, setEscuelas] = useState<{ id: string; name: string; active: boolean }[]>([]);
+  const [escuelas, setEscuelas] = useState<{ id: number; name: string; active: boolean }[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<{ id: number; name: string; active: boolean } | null>(null);
 
-  // 🔹 Función para obtener escuelas (solo si estamos en la vista "escuelas")
   async function fetchEscuelas() {
     try {
       setLoading(true);
@@ -37,15 +37,17 @@ function AdminContent() {
       if (!response.ok) throw new Error("Error al obtener las escuelas");
 
       const data = await response.json();
-      const formattedEscuelas = data.map((escuela: { Nombre: string; flg_activo: number }, index: number) => ({
-        id: (index + 1).toString(),
-        name: escuela.Nombre,
-        active: escuela.flg_activo === 1,
+
+      // 🔹 Convertir datos correctamente
+      const formattedEscuelas = data.map((escuela: { id: number; name: string; active: number }) => ({
+        id: escuela.id,
+        name: escuela.name,
+        active: Boolean(escuela.active), // Convertir a booleano
       }));
 
       setEscuelas(formattedEscuelas);
     } catch (err) {
-      console.error("Error al obtener las escuelas");
+      console.error("Error al obtener las escuelas:", err);
     } finally {
       setLoading(false);
     }
@@ -69,22 +71,37 @@ function AdminContent() {
               <h1 className="text-2xl font-bold tracking-tight">{pageTitle}</h1>
               <Button
                 className="bg-[#6366F1] hover:bg-[#4F46E5]"
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => {
+                  setSelectedUser(null);
+                  setShowForm(true);
+                }}
               >
-                {showForm ? "Cancelar" : `Agregar Nueva ${pageTitle}`}
+                {showForm && !selectedUser ? "Cancelar" : `Agregar Nueva ${pageTitle}`}
               </Button>
             </div>
-            {showForm && <DynamicForm reloadData={fetchEscuelas} />}
+            {showForm && <DynamicForm reloadData={fetchEscuelas} selectedUser={selectedUser} />}
             <Tabs defaultValue="actives" className="space-y-4">
               <TabsList className="bg-transparent border-b border-[#E5E7EB] w-full justify-start h-auto p-0 space-x-6">
                 <TabsTrigger value="actives">Activas</TabsTrigger>
                 <TabsTrigger value="inactives">Inactivas</TabsTrigger>
               </TabsList>
               <TabsContent value="actives">
-                <AdminMaestroTabla users={escuelas.filter((e) => e.active)} />
+                <AdminMaestroTabla 
+                  users={escuelas.filter((e) => e.active)} 
+                  onEdit={(user) => {
+                    setSelectedUser(user);
+                    setShowForm(true);
+                  }} 
+                />
               </TabsContent>
               <TabsContent value="inactives">
-                <AdminMaestroTabla users={escuelas.filter((e) => !e.active)} />
+                <AdminMaestroTabla 
+                  users={escuelas.filter((e) => !e.active)} 
+                  onEdit={(user) => {
+                    setSelectedUser(user);
+                    setShowForm(true);
+                  }} 
+                />
               </TabsContent>
             </Tabs>
           </div>
