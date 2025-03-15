@@ -25,7 +25,7 @@ export function FiltrosResultados({
   selectedPista, setSelectedPista
 }: FiltrosResultadosProps) {
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-row flex-wrap gap-4 w-full overflow-x-auto">
       <FiltroDropdown label="Guía" opciones={guias} selected={selectedGuia} setSelected={setSelectedGuia} />
       {selectedGuia !== "Guía" && <FiltroDropdown label="Perro" opciones={perros} selected={selectedPerro} setSelected={setSelectedPerro} />}
       {selectedPerro !== "Perro" && (
@@ -48,11 +48,11 @@ function FiltroDropdown({ label, opciones, selected, setSelected }: { label: str
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={`w-[250px] h-[45px] text-center truncate ${selected === label ? "font-bold" : ""}`}>
+        <Button variant="outline" className={`w-[200px] h-[45px] text-center truncate ${selected === label ? "font-bold" : ""}`}>
           {selected}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[250px]">
+      <DropdownMenuContent className="w-[200px]">
         {opciones.map((opcion) => (
           <DropdownMenuItem key={opcion} onClick={() => setSelected(opcion)}>{opcion}</DropdownMenuItem>
         ))}

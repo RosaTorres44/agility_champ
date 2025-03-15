@@ -16,7 +16,6 @@ export function Performance() {
   const [competencias, setCompetencias] = useState<{ id: number; nombre: string }[]>([{ id: 0, nombre: "Competencia" }]);
   const [pistas, setPistas] = useState<{ id: number; nombre: string }[]>([{ id: 0, nombre: "Pista" }]);
 
-  // 🔹 Cargar datos desde la API
   const fetchData = useCallback(async (endpoint: string) => {
     try {
       const response = await fetch(`/api/${endpoint}`);
@@ -73,8 +72,9 @@ export function Performance() {
   }, [selectedCompetencia]);
 
   return (
-    <div className="flex p-4 gap-6">
-      <aside className="lg:w-1/5">
+    <div className="flex flex-col p-4 gap-6">
+      {/* 📌 Contenedor de filtros en fila */}
+      <aside className="flex flex-row flex-wrap gap-4 w-full overflow-x-auto">
         <FiltrosResultados
           guias={guias} perros={perros} competencias={competencias} pistas={pistas}
           selectedGuia={selectedGuia} setSelectedGuia={setSelectedGuia}
@@ -83,14 +83,18 @@ export function Performance() {
           selectedPista={selectedPista} setSelectedPista={setSelectedPista}
         />
       </aside>
-      <div className="bg-white p-6 rounded-lg shadow-md text-sm flex-1">
+
+      {/* 📌 Tabla de resultados */}
+      <div className="bg-white p-6 rounded-lg shadow-md text-sm flex-1 overflow-auto">
         <h2 className="text-md font-semibold mb-3">Resultados</h2>
-        <TablaResultados
-          guia={selectedGuia === "Guía" ? null : selectedGuia}
-          perro={selectedPerro === "Perro" ? null : selectedPerro}
-          competencia={selectedCompetencia.id === 0 ? null : selectedCompetencia.nombre}
-          pista={selectedPista === "Pista" ? null : selectedPista}
-        />
+        <div className="overflow-x-auto">
+          <TablaResultados
+            guia={selectedGuia === "Guía" ? null : selectedGuia}
+            perro={selectedPerro === "Perro" ? null : selectedPerro}
+            competencia={selectedCompetencia.id === 0 ? null : selectedCompetencia.nombre}
+            pista={selectedPista === "Pista" ? null : selectedPista}
+          />
+        </div>
       </div>
     </div>
   );
