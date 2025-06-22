@@ -1,22 +1,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminMaestroTabla } from "@/components/admin-maestro-table";
 
-interface Entidad {
-  id: number;
-  name: string;
-  active: boolean;
-}
-
-// 🔹 Definir el tipo de acción que `dispatch` puede recibir
+// 🔹 Tipo de acción flexible
 type AdminAction =
-  | { type: "EDIT_ENTITY"; payload: Entidad }
+  | { type: "EDIT_ENTITY"; payload: any }
   | { type: "NEW_ENTITY" }
   | { type: "CLOSE_FORM" };
 
 interface AdminTableSectionProps {
   entityType: string;
-  entities: Entidad[];
-  dispatch: React.Dispatch<AdminAction>; // ✅ Ahora `dispatch` tiene el tipo correcto
+  entities: any[];
+  dispatch: React.Dispatch<AdminAction>;
 }
 
 export function AdminTableSection({ entityType, entities, dispatch }: AdminTableSectionProps) {
@@ -26,11 +20,12 @@ export function AdminTableSection({ entityType, entities, dispatch }: AdminTable
         <TabsTrigger value="actives">Activas</TabsTrigger>
         <TabsTrigger value="inactives">Inactivas</TabsTrigger>
       </TabsList>
+
       {["actives", "inactives"].map((status) => (
         <TabsContent key={status} value={status}>
           <AdminMaestroTabla
-            entityType={entityType}  
-            entities={entities.filter(e => e.active === (status === "actives"))}
+            entityType={entityType}
+            entities={entities.filter((e) => e.active === (status === "actives"))}
             onEdit={(entity) => dispatch({ type: "EDIT_ENTITY", payload: entity })}
           />
         </TabsContent>
