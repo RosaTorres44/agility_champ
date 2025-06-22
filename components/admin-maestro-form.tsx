@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -35,8 +37,19 @@ const esquemaPerro = z.object({
   active: z.boolean(),
 });
 
+const esquemaPersona = z.object({
+  name: z.string().min(2),
+  lastname: z.string().min(2),
+  birthdate: z.string(),
+  sexo: z.union([z.literal("0"), z.literal("1")]),
+  email: z.string().email(),
+  role: z.enum(["Usuario", "Juez"]),
+  active: z.boolean(),
+});
+
 type PerroForm = z.infer<typeof esquemaPerro>;
 type EntidadForm = z.infer<typeof esquemaEntidad>;
+type PersonaForm = z.infer<typeof esquemaPersona>;
 
 interface RazaOption {
   id: number;
@@ -56,24 +69,26 @@ export function DynamicForm({
   selectedEntity,
   onCancel,
 }: DynamicFormProps) {
-  const isPerro = entityType.toLowerCase() === "perros";
-  const schema = isPerro ? esquemaPerro : esquemaEntidad;
+  const key = entityType.toLowerCase();
+  const isPerro = key === "perros";
+  const isPersona = key === "usuarios" || key === "personas";
+  const schema = isPerro ? esquemaPerro : isPersona ? esquemaPersona : esquemaEntidad;
 
-  const form = useForm<PerroForm | EntidadForm>({
+  const form = useForm<any>({
     resolver: zodResolver(schema),
     defaultValues: isPerro
+      ? { Name: "", fecha_nacimiento: "", sexo: "0", chip: "", id_raza: "", active: true }
+      : isPersona
       ? {
-          Name: "",
-          fecha_nacimiento: "",
+          name: "",
+          lastname: "",
+          birthdate: "",
           sexo: "0",
-          chip: "",
-          id_raza: "",
+          email: "",
+          role: "Usuario",
           active: true,
         }
-      : {
-          name: "",
-          active: true,
-        },
+      : { name: "", active: true },
     mode: "onChange",
   });
 
@@ -91,18 +106,12 @@ export function DynamicForm({
 
   useEffect(() => {
     if (selectedEntity && isPerro && razas.length > 0) {
-      let sexoString: "0" | "1" = "0";
-      if (
-        selectedEntity.sexo === "Macho" ||
-        selectedEntity.sexo === 1 ||
-        selectedEntity.sexo === "1"
-      ) {
-        sexoString = "1";
-      }
+      const sexoString: "0" | "1" =
+        selectedEntity.sexo === "Macho" || selectedEntity.sexo === 1 || selectedEntity.sexo === "1"
+          ? "1"
+          : "0";
 
       const idRazaString = String(selectedEntity?.id_raza ?? "");
-      //alert(`📢 Raza recibida: ${idRazaString}`);
-
       const datosPerro: PerroForm = {
         Name: selectedEntity?.Name || selectedEntity?.Nombre || "",
         fecha_nacimiento: selectedEntity?.fecha_nacimiento?.slice(0, 10) || "",
@@ -113,38 +122,41 @@ export function DynamicForm({
       };
 
       form.reset(datosPerro);
-    } else if (selectedEntity && !isPerro) {
-      const datosEntidad: EntidadForm = {
-        name: selectedEntity?.name || "",
+      form.setValue("sexo", sexoString);
+    } else if (selectedEntity && isPersona) {
+      const sexoString: "0" | "1" =
+        selectedEntity.flg_sexo === "Hombre" || selectedEntity.flg_sexo === 1 || selectedEntity.flg_sexo === "1"
+          ? "1"
+          : "0";
+
+      const rol: "Usuario" | "Juez" =
+        selectedEntity.role === "Juez" || selectedEntity.role === "juez" ? "Juez" : "Usuario";
+
+      const datosPersona: PersonaForm = {
+        name: selectedEntity?.Nombre || selectedEntity?.name || "",
+        lastname: selectedEntity?.Apellidos || selectedEntity?.lastname || "",
+        birthdate: selectedEntity?.fec_nacimiento?.slice(0, 10) || selectedEntity?.birthdate || "",
+        sexo: sexoString,
+        email: selectedEntity?.email || "",
+        role: rol,
         active: selectedEntity?.active ?? true,
       };
-      form.reset(datosEntidad);
-    } else {
-      form.reset(
-        isPerro
-          ? {
-              Name: "",
-              fecha_nacimiento: "",
-              sexo: "0",
-              chip: "",
-              id_raza: "",
-              active: true,
-            }
-          : {
-              name: "",
-              active: true,
-            }
-      );
+
+      form.reset(datosPersona);
+      form.setValue("sexo", sexoString);
+      form.setValue("role", rol);
+    } else if (!isPerro && !isPersona) {
+      form.reset({ name: "", active: true });
     }
-  }, [selectedEntity, form, isPerro, razas]);
+  }, [selectedEntity, form, isPerro, isPersona, razas]);
 
   async function onSubmit(values: any) {
     try {
       const method = selectedEntity ? "PUT" : "POST";
       const body = {
         ...values,
-        sexo: parseInt(values.sexo),
-        id_raza: parseInt(values.id_raza),
+        sexo: isPerro || isPersona ? parseInt(values.sexo) : undefined,
+        id_raza: isPerro ? parseInt(values.id_raza) : undefined,
         id: selectedEntity?.id,
       };
       const url = `/api/${entityType.toLowerCase()}`;
@@ -178,19 +190,33 @@ export function DynamicForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {isPerro ? (
           <>
-            <FormField control={form.control} name="Name" render={({ field }) => (
+            {/* Aquí puedes poner los campos de perro si los necesitas */}
+          </>
+        ) : isPersona ? (
+          <>
+            <FormField control={form.control} name="name" render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre del Perro</FormLabel>
+                <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej. Luna" {...field} />
+                  <Input placeholder="Nombre" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="fecha_nacimiento" render={({ field }) => (
+            <FormField control={form.control} name="lastname" render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de Nacimiento</FormLabel>
+                <FormLabel>Apellidos</FormLabel>
+                <FormControl>
+                  <Input placeholder="Apellidos" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="birthdate" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -208,39 +234,36 @@ export function DynamicForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="0">Hembra</SelectItem>
-                    <SelectItem value="1">Macho</SelectItem>
+                    <SelectItem value="0">Mujer</SelectItem>
+                    <SelectItem value="1">Hombre</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="chip" render={({ field }) => (
+            <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
-                <FormLabel>Chip</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Código del chip" {...field} />
+                  <Input type="email" placeholder="ejemplo@correo.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="id_raza" render={({ field }) => (
+            <FormField control={form.control} name="role" render={({ field }) => (
               <FormItem>
-                <FormLabel>Raza</FormLabel>
-                <Select value={field.value} onValueChange={(value) => form.setValue("id_raza", value)}>
+                <FormLabel>Rol</FormLabel>
+                <Select value={field.value} onValueChange={(value) => form.setValue("role", value)}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar raza" />
+                      <SelectValue placeholder="Seleccionar rol" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {razas.map((r) => (
-                      <SelectItem key={r.id} value={String(r.id)}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="Usuario">Usuario</SelectItem>
+                    <SelectItem value="Juez">Juez</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

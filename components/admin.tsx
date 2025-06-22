@@ -16,6 +16,7 @@ const TITLES: Record<string, string> = {
   razas: "Razas",
   perros: "Perros",
   usuarios: "Usuarios",
+  personas: "Personas",
   resultados: "Resultados",
 };
 
@@ -70,6 +71,17 @@ export function Admin() {
           chip: e.chip,
           id_raza: e.id_raza,
           raza: e.raza,
+          active: !!e.active,
+        }));
+      } else if (entityType === "usuarios" || entityType === "personas") {
+        adaptados = data.map((e: any) => ({
+          id: e.id,
+          Nombre: e.Nombre || e.name || "",
+          Apellidos: e.Apellidos || e.name || "",
+          fec_nacimiento: e.fec_nacimiento,
+          flg_sexo: e.flg_sexo === 1 ? "Hombre" : "Mujer",
+          email: e.email || "",
+          role: e.role || "",
           active: !!e.active,
         }));
       } else {

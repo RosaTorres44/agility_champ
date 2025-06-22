@@ -25,6 +25,9 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
     switch (entityKey) {
       case "perros":
         return ["Nombre", "Fecha Nacimiento", "Sexo", "Chip", "Raza"];
+      case "usuarios":
+      case "personas":
+        return ["Nombre", "Apellidos", "Fecha Nacimiento", "sexo", "Correo", "Rol"];
       default:
         return ["Nombre"];
     }
@@ -71,6 +74,15 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
                     <TableCell>{entity.chip}</TableCell>
                     <TableCell>{entity.raza}</TableCell>
                   </>
+                ) : entityKey === "usuarios" || entityKey === "personas" ? (
+                  <>
+                    <TableCell>{entity.Nombre}</TableCell>
+                    <TableCell>{entity.Apellidos}</TableCell>
+                    <TableCell>{formatFecha(entity.fec_nacimiento)}</TableCell>
+                    <TableCell>{entity.flg_sexo}</TableCell>
+                    <TableCell>{entity.email}</TableCell>
+                    <TableCell>{entity.role}</TableCell>
+                  </>        
                 ) : (
                   <TableCell>{entity.name}</TableCell>
                 )}
@@ -78,10 +90,7 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
                 <TableCell>
                   <Button
                     className="bg-[#6366F1] hover:bg-[#4F46E5]"
-                    onClick={() => {
-                      //alert(`Raza seleccionada: ${entity.raza}`); // ✅ Muestra una alerta con la descripción de la raza
-                      onEdit(entity); // Llama a la función de edición
-                    }}
+                    onClick={() => onEdit(entity)}
                   >
                     <PencilIcon className="w-4 h-4 text-white" />
                   </Button>
