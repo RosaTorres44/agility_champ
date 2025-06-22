@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// 🔹 Esquemas
 const esquemaEntidad = z.object({
   name: z.string().min(2),
   active: z.boolean(),
@@ -47,11 +48,19 @@ const esquemaPersona = z.object({
   active: z.boolean(),
 });
 
-type PerroForm = z.infer<typeof esquemaPerro>;
-type EntidadForm = z.infer<typeof esquemaEntidad>;
-type PersonaForm = z.infer<typeof esquemaPersona>;
+const esquemaCompetencia = z.object({
+  name: z.string().min(2),
+  id_escuela: z.string().min(1),
+  fec_inicio: z.string(),
+  fec_fin: z.string(),
+  active: z.boolean(),
+});
 
-interface RazaOption {
+type PerroForm = z.infer<typeof esquemaPerro>;
+type PersonaForm = z.infer<typeof esquemaPersona>;
+type CompetenciaForm = z.infer<typeof esquemaCompetencia>;
+
+interface Option {
   id: number;
   name: string;
 }
@@ -72,7 +81,15 @@ export function DynamicForm({
   const key = entityType.toLowerCase();
   const isPerro = key === "perros";
   const isPersona = key === "usuarios" || key === "personas";
-  const schema = isPerro ? esquemaPerro : isPersona ? esquemaPersona : esquemaEntidad;
+  const isCompetencia = key === "competencias";
+
+  const schema = isPerro
+    ? esquemaPerro
+    : isPersona
+    ? esquemaPersona
+    : isCompetencia
+    ? esquemaCompetencia
+    : esquemaEntidad;
 
   const form = useForm<any>({
     resolver: zodResolver(schema),
@@ -88,54 +105,76 @@ export function DynamicForm({
           role: "Usuario",
           active: true,
         }
+      : isCompetencia
+      ? {
+          name: "",
+          id_escuela: "",
+          fec_inicio: "",
+          fec_fin: "",
+          active: true,
+        }
       : { name: "", active: true },
     mode: "onChange",
   });
 
-  const [razas, setRazas] = useState<RazaOption[]>([]);
+  const [opcionesEscuela, setOpcionesEscuela] = useState<Option[]>([]);
+  const [opcionesRaza, setOpcionesRaza] = useState<Option[]>([]);
 
+  // 🔹 Cargar escuelas o razas activas
   useEffect(() => {
+    if (isCompetencia) {
+      fetch("/api/escuelas")
+        .then((res) => res.json())
+        .then((data) => {
+          const activos = data.filter((e: any) => e.active === 1 || e.active === true);
+          setOpcionesEscuela(activos);
+        });
+    }
     if (isPerro) {
       fetch("/api/razas")
         .then((res) => res.json())
-        .then((data) =>
-          setRazas(data.sort((a: RazaOption, b: RazaOption) => a.name.localeCompare(b.name)))
-        );
+        .then((data) => {
+          const activos = data.filter((e: any) => e.active === 1 || e.active === true);
+          setOpcionesRaza(activos);
+        });
     }
-  }, [isPerro]);
+  }, [isCompetencia, isPerro]);
 
+  // 🔹 Cargar datos del formulario
   useEffect(() => {
-    if (selectedEntity && isPerro && razas.length > 0) {
+    if (!selectedEntity) return;
+
+    if (isPerro && opcionesRaza.length > 0) {
       const sexoString: "0" | "1" =
         selectedEntity.sexo === "Macho" || selectedEntity.sexo === 1 || selectedEntity.sexo === "1"
           ? "1"
           : "0";
 
-      const idRazaString = String(selectedEntity?.id_raza ?? "");
       const datosPerro: PerroForm = {
         Name: selectedEntity?.Name || selectedEntity?.Nombre || "",
         fecha_nacimiento: selectedEntity?.fecha_nacimiento?.slice(0, 10) || "",
         sexo: sexoString,
         chip: selectedEntity?.chip?.toString() || "",
-        id_raza: idRazaString,
+        id_raza: String(selectedEntity?.id_raza ?? ""),
         active: selectedEntity?.active ?? true,
       };
 
       form.reset(datosPerro);
       form.setValue("sexo", sexoString);
-    } else if (selectedEntity && isPersona) {
+    }
+
+    if (isPersona) {
       const sexoString: "0" | "1" =
         selectedEntity.flg_sexo === "Hombre" || selectedEntity.flg_sexo === 1 || selectedEntity.flg_sexo === "1"
           ? "1"
           : "0";
-
       const rol: "Usuario" | "Juez" =
         selectedEntity.role === "Juez" || selectedEntity.role === "juez" ? "Juez" : "Usuario";
 
       const datosPersona: PersonaForm = {
-        name: selectedEntity?.Nombre || selectedEntity?.name || "",
-        lastname: selectedEntity?.Apellidos || selectedEntity?.lastname || "",
-        birthdate: selectedEntity?.fec_nacimiento?.slice(0, 10) || selectedEntity?.birthdate || "",
+        name: selectedEntity?.Nombre || "",
+        lastname: selectedEntity?.Apellidos || "",
+        birthdate: selectedEntity?.fec_nacimiento?.slice(0, 10) || "",
         sexo: sexoString,
         email: selectedEntity?.email || "",
         role: rol,
@@ -145,22 +184,40 @@ export function DynamicForm({
       form.reset(datosPersona);
       form.setValue("sexo", sexoString);
       form.setValue("role", rol);
-    } else if (!isPerro && !isPersona) {
-      form.reset({ name: "", active: true });
     }
-  }, [selectedEntity, form, isPerro, isPersona, razas]);
 
+    if (isCompetencia && opcionesEscuela.length > 0) {
+      const idEscuelaStr = String(selectedEntity?.id_escuela ?? "");
+      const datosCompetencia: CompetenciaForm = {
+        name: selectedEntity?.name || selectedEntity?.Nombre || "",
+        id_escuela: idEscuelaStr,
+        fec_inicio: selectedEntity?.fec_inicio?.slice(0, 10) || "",
+        fec_fin: selectedEntity?.fec_fin?.slice(0, 10) || "",
+        active: selectedEntity?.active ?? true,
+      };
+
+      form.reset(datosCompetencia);
+      form.setValue("id_escuela", idEscuelaStr);
+    }
+
+    if (!isCompetencia && !isPersona && !isPerro) {
+      form.reset({ name: selectedEntity?.name || "", active: selectedEntity?.active ?? true });
+    }
+  }, [selectedEntity, form, isPerro, isPersona, isCompetencia, opcionesRaza, opcionesEscuela]);
+
+  // 🔹 Envío del formulario
   async function onSubmit(values: any) {
     try {
       const method = selectedEntity ? "PUT" : "POST";
       const body = {
         ...values,
+        id: selectedEntity?.id,
         sexo: isPerro || isPersona ? parseInt(values.sexo) : undefined,
         id_raza: isPerro ? parseInt(values.id_raza) : undefined,
-        id: selectedEntity?.id,
+        id_escuela: isCompetencia ? parseInt(values.id_escuela) : undefined,
       };
-      const url = `/api/${entityType.toLowerCase()}`;
 
+      const url = `/api/${entityType.toLowerCase()}`;
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -171,52 +228,55 @@ export function DynamicForm({
       if (data.error) {
         alert(`❌ Error: ${data.error}`);
       } else {
-        alert(
-          selectedEntity
-            ? `✅ ${entityType} actualizada exitosamente`
-            : `✅ ${entityType} agregada exitosamente`
-        );
+        alert(selectedEntity ? `✅ ${entityType} actualizada` : `✅ ${entityType} agregada`);
         reloadData();
         onCancel();
       }
     } catch (error) {
       console.error("❌ Error en el fetch:", error);
-      alert(`❌ Hubo un problema al registrar la ${entityType.toLowerCase()}`);
+      alert(`❌ Hubo un problema al registrar la ${entityType}`);
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {isPerro ? (
-          <>
-            {/* Aquí puedes poner los campos de perro si los necesitas */}
-          </>
-        ) : isPersona ? (
+        {isCompetencia && (
           <>
             <FormField control={form.control} name="name" render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre</FormLabel>
+                <FormLabel>Nombre de la competencia</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nombre" {...field} />
+                  <Input placeholder="Ej: Copa Agility 2025" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="lastname" render={({ field }) => (
+            <FormField control={form.control} name="id_escuela" render={({ field }) => (
               <FormItem>
-                <FormLabel>Apellidos</FormLabel>
-                <FormControl>
-                  <Input placeholder="Apellidos" {...field} />
-                </FormControl>
+                <FormLabel>Escuela</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar escuela" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {opcionesEscuela.map((esc) => (
+                      <SelectItem key={esc.id} value={String(esc.id)}>
+                        {esc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="birthdate" render={({ field }) => (
+            <FormField control={form.control} name="fec_inicio" render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormLabel>Fecha de inicio</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -224,58 +284,24 @@ export function DynamicForm({
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="sexo" render={({ field }) => (
+            <FormField control={form.control} name="fec_fin" render={({ field }) => (
               <FormItem>
-                <FormLabel>Sexo</FormLabel>
-                <Select value={field.value} onValueChange={(value) => form.setValue("sexo", value as "0" | "1")}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar sexo" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="0">Mujer</SelectItem>
-                    <SelectItem value="1">Hombre</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="email" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Fecha de fin</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="ejemplo@correo.com" {...field} />
+                  <Input type="date" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-
-            <FormField control={form.control} name="role" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rol</FormLabel>
-                <Select value={field.value} onValueChange={(value) => form.setValue("role", value)}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar rol" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Usuario">Usuario</SelectItem>
-                    <SelectItem value="Juez">Juez</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
           </>
-        ) : (
+        )}
+
+        {!isCompetencia && !isPersona && !isPerro && (
           <FormField control={form.control} name="name" render={({ field }) => (
             <FormItem>
               <FormLabel>{`Nombre de ${entityType}`}</FormLabel>
               <FormControl>
-                <Input placeholder={`Ingresar nombre de ${entityType}`} {...field} />
+                <Input placeholder={`Nombre de ${entityType}`} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -33,8 +33,8 @@ git add .
 git commit -m "Primera versión del proyecto"
 
 git branch -M version1
-git pull origin version1
-git push origin version1
+git pull origin reinicio
+git push origin reinicio
 
 
 python3 -m venv venv

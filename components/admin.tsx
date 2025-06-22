@@ -84,6 +84,16 @@ export function Admin() {
           role: e.role || "",
           active: !!e.active,
         }));
+      } else if (entityType === "competencias") {
+        adaptados = data.map((e: any) => ({
+          id: e.id,
+          name: e.name,
+          escuela: e.escuela, // para mostrar en tabla
+          id_escuela: e.id_escuela, // 👈 necesario para formulario
+          fec_inicio: e.fec_inicio,
+          fec_fin: e.fec_fin,
+          active: !!e.active,
+        }));      
       } else {
         adaptados = data.map((e: any) => ({
           id: e.id,

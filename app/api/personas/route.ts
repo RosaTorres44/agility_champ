@@ -104,3 +104,4 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Error al actualizar persona" }, { status: 500 });
   }
 }
+

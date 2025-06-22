@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const query = "SELECT c.id_categoria AS id, c.des_categoria AS name,  c.des_categoria AS Nombre, c.flg_activo AS active FROM categoria c ORDER BY c.id_categoria ASC";
+    const query = "SELECT c.id_categoria AS id, c.des_categoria AS name,  c.des_categoria AS Nombre, c.flg_activo AS active FROM categoria c where flg_activo =1 ORDER BY c.id_categoria ASC";
     console.log("Executing query:", query); // Depuración
 
     const [rows] = await pool.query(query);

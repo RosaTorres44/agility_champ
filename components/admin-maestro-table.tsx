@@ -28,6 +28,8 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
       case "usuarios":
       case "personas":
         return ["Nombre", "Apellidos", "Fecha Nacimiento", "sexo", "Correo", "Rol"];
+      case "competencias":
+        return ["Nombre", "Escuela", "Inicio", "Fin"];
       default:
         return ["Nombre"];
     }
@@ -82,7 +84,14 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
                     <TableCell>{entity.flg_sexo}</TableCell>
                     <TableCell>{entity.email}</TableCell>
                     <TableCell>{entity.role}</TableCell>
-                  </>        
+                  </>
+                ) : entityKey === "competencias" ? (
+                  <>
+                    <TableCell>{entity.name}</TableCell>
+                    <TableCell>{entity.escuela}</TableCell>
+                    <TableCell>{formatFecha(entity.fec_inicio)}</TableCell>
+                    <TableCell>{formatFecha(entity.fec_fin)}</TableCell>
+                  </>
                 ) : (
                   <TableCell>{entity.name}</TableCell>
                 )}
