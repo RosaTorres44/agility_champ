@@ -13,9 +13,6 @@ Thumbs.db
 .next/static
 .next/
 out/
-.env
-.env.local
-.env.*.local
 coverage/
 node_modules/*
 .next/*
@@ -30,7 +27,4 @@ node_modules/remark-react/*
 node_modules/remark-stringify/*
 node_modules/remark-wiki-link/* 
 node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node
-node_modules/ 
-.env_local
-.env_web
-.env
+node_modules/
