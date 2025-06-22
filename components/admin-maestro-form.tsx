@@ -120,7 +120,6 @@ export function DynamicForm({
   const [opcionesEscuela, setOpcionesEscuela] = useState<Option[]>([]);
   const [opcionesRaza, setOpcionesRaza] = useState<Option[]>([]);
 
-  // 🔹 Cargar escuelas o razas activas
   useEffect(() => {
     if (isCompetencia) {
       fetch("/api/escuelas")
@@ -140,7 +139,6 @@ export function DynamicForm({
     }
   }, [isCompetencia, isPerro]);
 
-  // 🔹 Cargar datos del formulario
   useEffect(() => {
     if (!selectedEntity) return;
 
@@ -160,7 +158,6 @@ export function DynamicForm({
       };
 
       form.reset(datosPerro);
-      form.setValue("sexo", sexoString);
     }
 
     if (isPersona) {
@@ -182,8 +179,6 @@ export function DynamicForm({
       };
 
       form.reset(datosPersona);
-      form.setValue("sexo", sexoString);
-      form.setValue("role", rol);
     }
 
     if (isCompetencia && opcionesEscuela.length > 0) {
@@ -197,7 +192,6 @@ export function DynamicForm({
       };
 
       form.reset(datosCompetencia);
-      form.setValue("id_escuela", idEscuelaStr);
     }
 
     if (!isCompetencia && !isPersona && !isPerro) {
@@ -205,7 +199,6 @@ export function DynamicForm({
     }
   }, [selectedEntity, form, isPerro, isPersona, isCompetencia, opcionesRaza, opcionesEscuela]);
 
-  // 🔹 Envío del formulario
   async function onSubmit(values: any) {
     try {
       const method = selectedEntity ? "PUT" : "POST";
@@ -241,31 +234,69 @@ export function DynamicForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {isCompetencia && (
+        {isPerro && (
           <>
-            <FormField control={form.control} name="name" render={({ field }) => (
+            <FormField control={form.control} name="Name" render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre de la competencia</FormLabel>
+                <FormLabel>Nombre del perro</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Copa Agility 2025" {...field} />
+                  <Input placeholder="Ej: Rocky" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="id_escuela" render={({ field }) => (
+            <FormField control={form.control} name="fecha_nacimiento" render={({ field }) => (
               <FormItem>
-                <FormLabel>Escuela</FormLabel>
+                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="sexo" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sexo</FormLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar escuela" />
+                      <SelectValue placeholder="Seleccionar sexo" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {opcionesEscuela.map((esc) => (
-                      <SelectItem key={esc.id} value={String(esc.id)}>
-                        {esc.name}
+                    <SelectItem value="0">Hembra</SelectItem>
+                    <SelectItem value="1">Macho</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="chip" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Chip</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: 123456" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="id_raza" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Raza</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar raza" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {opcionesRaza.map((raza) => (
+                      <SelectItem key={raza.id} value={String(raza.id)}>
+                        {raza.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -273,10 +304,34 @@ export function DynamicForm({
                 <FormMessage />
               </FormItem>
             )} />
+          </>
+        )}
 
-            <FormField control={form.control} name="fec_inicio" render={({ field }) => (
+        {isPersona && (
+          <>
+            <FormField control={form.control} name="name" render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de inicio</FormLabel>
+                <FormLabel>Nombres</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Ana" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="lastname" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Apellidos</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: López" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="birthdate" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -284,19 +339,55 @@ export function DynamicForm({
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="fec_fin" render={({ field }) => (
+            <FormField control={form.control} name="sexo" render={({ field }) => (
               <FormItem>
-                <FormLabel>Fecha de fin</FormLabel>
+                <FormLabel>Sexo</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar sexo" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="0">Femenino</SelectItem>
+                    <SelectItem value="1">Masculino</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="email" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type="email" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="role" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rol</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar rol" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Usuario">Usuario</SelectItem>
+                    <SelectItem value="Juez">Juez</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )} />
           </>
         )}
 
-        {!isCompetencia && !isPersona && !isPerro && (
+        {!isPerro && !isPersona && !isCompetencia && (
           <FormField control={form.control} name="name" render={({ field }) => (
             <FormItem>
               <FormLabel>{`Nombre de ${entityType}`}</FormLabel>
