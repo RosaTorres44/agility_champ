@@ -1,13 +1,17 @@
+// 📁 app/api/personas/route.ts
 import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
-
 export const dynamic = "force-dynamic";
 
-// GET - Listar personas
-export async function GET() {
+// 🔹 Obtener todas las personas
+
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo") || "1";
+
     const query = `
-      SELECT 
+        SELECT 
         p.id_persona AS id,
         p.des_nombres AS Nombre,
         p.des_apellidos AS Apellidos,
@@ -16,24 +20,29 @@ export async function GET() {
         p.des_correo AS email,
         p.des_rol AS role,
         p.flg_activo AS active
-      FROM agilitychamp.persona p;
+      FROM agilitychamp.persona p 
     `;
 
-    const [rows] = await pool.query(query);
+    const [rows] = await pool.query(query, [flg_activo]);
+
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al obtener lista de personas:", error);
+    console.error("Error al obtener las categorías:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
-// POST - Crear nueva persona
+
+// 🔹 Insertar una nueva persona
 export async function POST(req: Request) {
   try {
-    const { name, lastname, birthdate, sexo, email, role, active } = await req.json();
+    const body = await req.json();
+    console.log("📥 Datos recibidos en POST:", body);
 
-    if (!name || !lastname || !birthdate || sexo === undefined || !email || !role) {
-      return NextResponse.json({ error: "Campos obligatorios faltantes" }, { status: 400 });
+    const { name, lastname, birthdate, flg_sexo, email, role, active } = body;
+
+    if (!name || !lastname || !email || typeof active !== "boolean") {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `
@@ -52,26 +61,27 @@ export async function POST(req: Request) {
       name,
       lastname,
       birthdate,
-      parseInt(sexo),
+      flg_sexo,
       email,
       role,
       active ? 1 : 0,
     ]);
 
-    return NextResponse.json({ message: "Persona creada exitosamente" });
+    return NextResponse.json({ message: "Persona registrada con éxito" });
   } catch (error) {
-    console.error("Error al crear persona:", error);
-    return NextResponse.json({ error: "Error al crear persona" }, { status: 500 });
+    console.error("❌ Error al insertar persona:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
-// PUT - Actualizar persona
+// 🔹 Actualizar una persona existente
 export async function PUT(req: Request) {
   try {
-    const { id, name, lastname, birthdate, sexo, email, role, active } = await req.json();
+    const body = await req.json();
+    const { id, name, lastname, birthdate, flg_sexo, email, role, active } = body;
 
-    if (!id) {
-      return NextResponse.json({ error: "ID requerido para actualizar" }, { status: 400 });
+    if (!id || !name || !lastname || !email || typeof active !== "boolean") {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `
@@ -87,21 +97,24 @@ export async function PUT(req: Request) {
       WHERE id_persona = ?
     `;
 
-    await pool.query(query, [
+    const [result]: any = await pool.query(query, [
       name,
       lastname,
       birthdate,
-      parseInt(sexo),
+      flg_sexo,
       email,
       role,
       active ? 1 : 0,
-      id,
+      id
     ]);
 
-    return NextResponse.json({ message: "Persona actualizada exitosamente" });
+    if (result.affectedRows === 0) {
+      return NextResponse.json({ error: "Persona no encontrada" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Persona actualizada con éxito" });
   } catch (error) {
-    console.error("Error al actualizar persona:", error);
-    return NextResponse.json({ error: "Error al actualizar persona" }, { status: 500 });
+    console.error("❌ Error al actualizar persona:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
-

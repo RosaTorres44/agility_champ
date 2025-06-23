@@ -2,17 +2,21 @@ import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
-
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const query = "SELECT c.id_categoria AS id, c.des_categoria AS name,  c.des_categoria AS Nombre, c.flg_activo AS active FROM categoria c where flg_activo =1 ORDER BY c.id_categoria ASC";
-    console.log("Executing query:", query); // Depuración
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo") || "1";
 
-    const [rows] = await pool.query(query);
+    const query = `
+      SELECT 
+        c.id_categoria AS id,
+        c.des_categoria AS Nombre,
+        c.flg_activo AS active 
+      FROM categoria c  
+      ORDER BY c.id_categoria ASC
+    `;
 
-    if (Array.isArray(rows) && rows.length === 0) {
-      console.warn("No se encontraron categorías en la base de datos.");
-    }
+    const [rows] = await pool.query(query, [flg_activo]);
 
     return NextResponse.json(rows);
   } catch (error) {

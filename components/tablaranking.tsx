@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 
 interface TablaRankingProps {
   gradoFilter: string | null;
-  categoriaFilter: string | null;
-  pistaFilter: string | null;
+  categoriaFilter: string | null; 
   filter: string | null | undefined;
   competitionId?: number | null; // ID de la competencia seleccionada o null para la última activa
 }
 
-export function TablaRankingOri({ gradoFilter, categoriaFilter, pistaFilter, filter, competitionId = null }: TablaRankingProps) {
+export function TablaRankingOri({ gradoFilter, categoriaFilter, filter, competitionId = null }: TablaRankingProps) {
   const [rankings, setRankings] = useState<any[]>([]);
   const [filteredRankings, setFilteredRankings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,24 +47,22 @@ export function TablaRankingOri({ gradoFilter, categoriaFilter, pistaFilter, fil
     if (!rankings.length) return;
 
     const isTodosGrados = !gradoFilter || gradoFilter === "Grados";
-    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Categorías";
-    const isTodasPistas = !pistaFilter || pistaFilter === "Pistas";
+    const isTodasCategorias = !categoriaFilter || categoriaFilter === "Categorías"; 
 
-    if (isTodosGrados && isTodasCategorias && isTodasPistas) {
+    if (isTodosGrados && isTodasCategorias  ) {
       // Mostrar todos los registros si ambos filtros están en "Todos"
       setFilteredRankings(rankings);
     } else {
       // Aplicar filtros específicos
       const filtered = rankings.filter((ranking) => {
         const matchesGrado = isTodosGrados || ranking.grado === gradoFilter;
-        const matchesCategoria = isTodasCategorias || ranking.categoria === categoriaFilter;
-        const matchesPista = isTodasPistas || ranking.pista === pistaFilter;
-        return matchesGrado && matchesCategoria && matchesPista;
+        const matchesCategoria = isTodasCategorias || ranking.categoria === categoriaFilter; 
+        return matchesGrado && matchesCategoria ;
       });
 
       setFilteredRankings(filtered);
     }
-  }, [gradoFilter, categoriaFilter, pistaFilter, rankings]);
+  }, [gradoFilter, categoriaFilter, rankings]);
 
   if (loading) {
     return <div>Cargando rankings...</div>;

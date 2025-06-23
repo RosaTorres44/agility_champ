@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const query = `
       SELECT c.id_competencia AS id,
-             c.des_competencia AS name,
+             c.des_competencia AS Nombre,
              c.id_escuela,
              e.des_escuela AS escuela,
              c.fec_inicio,

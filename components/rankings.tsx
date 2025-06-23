@@ -9,8 +9,7 @@ interface CompetitionsProps {
 
 export function Rankings({ filter }: CompetitionsProps)  {
   const [gradoFilter, setGradoFilter] = useState<string | null>(null);
-  const [categoriaFilter, setCategoriaFilter] = useState<string | null>(null);
-  const [pistaFilter, setPistaFilter] = useState<string | null>(null);
+  const [categoriaFilter, setCategoriaFilter] = useState<string | null>(null); 
 
   return (
     <section className="py-12 px-6 sm:px-12">
@@ -22,11 +21,9 @@ export function Rankings({ filter }: CompetitionsProps)  {
         gradoFilter={gradoFilter} 
         setGradoFilter={setGradoFilter} 
         categoriaFilter={categoriaFilter} 
-        setCategoriaFilter={setCategoriaFilter} 
-        pistaFilter={pistaFilter} 
-        setPistaFilter={setPistaFilter} 
+        setCategoriaFilter={setCategoriaFilter}  
       />
-      <TablaRankingOri gradoFilter={gradoFilter} categoriaFilter={categoriaFilter} pistaFilter={pistaFilter} filter={filter} />
+      <TablaRankingOri gradoFilter={gradoFilter} categoriaFilter={categoriaFilter}  filter={filter} />
     </section>
   );
 }
