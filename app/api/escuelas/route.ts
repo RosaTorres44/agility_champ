@@ -3,30 +3,28 @@ import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
 // 🔹 Obtener todas las escuelas
-export async function GET() {
+
+export async function GET(req: Request) {
   try {
-    const query = ` SELECT 
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo") || "1";
+
+    const query = `
+     SELECT 
         e.id_escuela AS id, 
-        e.des_escuela AS Nombre, 
-        e.des_escuela AS name, 
-        e.flg_activo AS active 
-      FROM escuela e`
-    console.log("Executing query:", query); // Depuración
+        e.des_escuela AS nombre,  
+        e.flg_activo AS flg_activo 
+      FROM escuela e
+    `;
 
-    const [rows] = await pool.query(query);
-
-    if (Array.isArray(rows) && rows.length === 0) {
-      console.warn("No se encontraron grado en la base de datos.");
-    }
+    const [rows] = await pool.query(query, [flg_activo]);
 
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al obtener las grado:", error);
+    console.error("Error al obtener las categorías:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
-
-
 
 
  
@@ -37,16 +35,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("📥 Datos recibidos en POST:", body);
 
-    const { Nombre, active } = body;
-    console.log("📦 Desestructurados:", { Nombre, active });
+    const { nombre, flg_activo } = body;
+    console.log("📦 Desestructurados:", { nombre, flg_activo });
 
-    if (!Nombre || typeof active !== "boolean") {
+    if (!nombre || typeof flg_activo !== "boolean") {
       console.warn("⚠️ Datos inválidos en POST");
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `INSERT INTO escuela (des_escuela, flg_activo) VALUES (?, ?)`;
-    await pool.query(query, [Nombre, active ? 1 : 0]);
+    await pool.query(query, [nombre, flg_activo ? 1 : 0]);
 
     return NextResponse.json({ message: "Escuela registrada con éxito" });
   } catch (error) {
@@ -61,16 +59,16 @@ export async function PUT(req: Request) {
     const body = await req.json();
     console.log("📥 Datos recibidos en PUT:", body);
 
-    const { id, Nombre, active } = body;
-    console.log("📦 Desestructurados:", { id, Nombre, active });
+    const { id, nombre, flg_activo } = body;
+    console.log("📦 Desestructurados:", { id, nombre, flg_activo });
 
-    if (!id || !Nombre || typeof active !== "boolean") {
+    if (!id || !nombre || typeof flg_activo !== "boolean") {
       console.warn("⚠️ Datos inválidos en PUT");
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `UPDATE escuela SET des_escuela = ?, flg_activo = ? WHERE id_escuela = ?`;
-    await pool.query(query, [Nombre, active ? 1 : 0, id]);
+    await pool.query(query, [nombre, flg_activo ? 1 : 0, id]);
 
     return NextResponse.json({ message: "Escuela actualizada con éxito" });
   } catch (error) {

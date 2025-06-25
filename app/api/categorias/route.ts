@@ -10,8 +10,8 @@ export async function GET(req: Request) {
     const query = `
       SELECT 
         c.id_categoria AS id,
-        c.des_categoria AS Nombre,
-        c.flg_activo AS active 
+        c.des_categoria AS nombre,
+        c.flg_activo AS flg_activo 
       FROM categoria c  
       ORDER BY c.id_categoria ASC
     `;
@@ -32,14 +32,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("Datos recibidos en POST:", body); // 🔹 Verifica los datos
 
-    const { name, active } = body;
+    const { nombre, flg_activo } = body;
 
-    if (!name || typeof active !== "boolean") {
+    if (!nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `INSERT INTO categoria (des_categoria, flg_activo) VALUES (?, ?)`;
-    await pool.query(query, [name, active ? 1 : 0]);
+    await pool.query(query, [nombre, flg_activo ? 1 : 0]);
 
     return NextResponse.json({ message: "Categoria registrada con éxito" });
   } catch (error) { 
@@ -50,9 +50,9 @@ export async function POST(req: Request) {
 // 🔹 Actualizar una categoria existente
 export async function PUT(req: Request) {
   try {
-    const { id, name, active } = await req.json();
+    const { id, nombre, flg_activo } = await req.json();
 
-    if (!id || !name || typeof active !== "boolean") {
+    if (!id || !nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -62,7 +62,7 @@ export async function PUT(req: Request) {
       WHERE id_categoria= ?
     `;
 
-    const [result]: any = await pool.query(query, [name, active ? 1 : 0, id]);
+    const [result]: any = await pool.query(query, [nombre, flg_activo ? 1 : 0, id]);
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Categoria no encontrada" }, { status: 404 });

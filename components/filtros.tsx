@@ -7,7 +7,7 @@ interface FiltrosProps {
   setGradoFilter: (value: string | null) => void;
   categoriaFilter: string | null;
   setCategoriaFilter: (value: string | null) => void; 
-  filter?: "active" | "all";
+  filter?: "flg_activo" | "all";
   competitionId?: number | null;
 }
 

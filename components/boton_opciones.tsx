@@ -8,7 +8,7 @@ interface DropdownFilterProps {
   endpoint: string;
   selectedOption: string | null;
   setSelectedOption: (option: string) => void;
-  filter?: "active" | "all";
+  filter?: "flg_activo" | "all";
   competitionId?: number | null;
 }
 
@@ -18,10 +18,10 @@ export function DropdownFilter({ label, endpoint, selectedOption, setSelectedOpt
   useEffect(() => {
     fetchData(endpoint, filter, competitionId)
       .then(data => {
-        // 🔹 Filtrar solo los elementos con `active = 1`
+        // 🔹 Filtrar solo los elementos con `flg_activo = 1`
         const filteredOptions = data
-          .filter((item: { active: number }) => item.active === 1)
-          .map((item: { Nombre: string }) => item.Nombre);
+          .filter((item: { flg_activo: number }) => item.flg_activo === 1)
+          .map((item: { nombre: string }) => item.nombre);
         setOptions(filteredOptions);
       })
       .catch(error => console.error(`Error al cargar ${label.toLowerCase()}:`, error));
@@ -47,11 +47,11 @@ export function DropdownFilter({ label, endpoint, selectedOption, setSelectedOpt
 }
 
 // 🔹 Función para obtener datos filtrados
-async function fetchData(endpoint: string, filter?: "active" | "all", competitionId?: number | null) {
+async function fetchData(endpoint: string, filter?: "flg_activo" | "all", competitionId?: number | null) {
   let url = `/api/${endpoint}`;
 
   if (endpoint === "pistas") {
-    const compId = filter === "active" ? await getActiveCompetitionId() : competitionId;
+    const compId = filter === "flg_activo" ? await getActiveCompetitionId() : competitionId;
     if (compId) url = `/api/pistas?competencia_id=${compId}`;
   }
 
@@ -60,8 +60,8 @@ async function fetchData(endpoint: string, filter?: "active" | "all", competitio
 
   const data = await response.json();
 
-  // 🔹 Filtrar `active = 1` para categorías y grados
-  return data.filter((item: { active: number }) => item.active === 1);
+  // 🔹 Filtrar `flg_activo = 1` para categorías y grados
+  return data.filter((item: { flg_activo: number }) => item.flg_activo === 1); // ✅ Actualizado para usar `flg_activo`
 }
 
 // 🔹 Función para obtener la ID de la competencia activa

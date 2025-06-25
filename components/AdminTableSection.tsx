@@ -25,7 +25,7 @@ export function AdminTableSection({ entityType, entities, dispatch }: AdminTable
         <TabsContent key={status} value={status}>
           <AdminMaestroTabla
             entityType={entityType}
-            entities={entities.filter((e) => e.active === (status === "actives"))}
+            entities={entities.filter((e) => e.flg_activo === (status === "actives"))}
             onEdit={(entity) => dispatch({ type: "EDIT_ENTITY", payload: entity })}
           />
         </TabsContent>

@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-export const renderCampo = (form: any, name: string, label: string, type = "text") => (
-  <FormField control={form.control} name={name} render={({ field }) => (
+export const renderCampo = (form: any, nombre: string, label: string, type = "text") => (
+  <FormField control={form.control} name={nombre} render={({ field }) => (
     <FormItem>
       <FormLabel>{label}</FormLabel>
       <FormControl>
@@ -30,11 +30,11 @@ export const renderCampo = (form: any, name: string, label: string, type = "text
 
 export const renderSelect = (
   form: any,
-  name: string,
+  nombre: string,
   label: string,
-  opciones: { id: number | string; name: string }[]
+  opciones: { id: number | string; nombre: string }[]
 ) => (
-  <FormField control={form.control} name={name} render={({ field }) => (
+  <FormField control={form.control} name={nombre} render={({ field }) => (
     <FormItem>
       <FormLabel>{label}</FormLabel>
       <Select value={field.value} onValueChange={field.onChange}>
@@ -46,7 +46,7 @@ export const renderSelect = (
         <SelectContent>
           {opciones.map((opt) => (
             <SelectItem key={opt.id} value={String(opt.id)}>
-              {opt.name}
+              {opt.nombre}
             </SelectItem>
           ))}
         </SelectContent>
@@ -56,14 +56,14 @@ export const renderSelect = (
   )} />
 );
 
-export const renderSwitch = (form: any, name: string, label: string) => (
-  <FormField control={form.control} name={name} render={({ field }) => (
+export const renderSwitch = (form: any, nombre: string, label: string) => (
+  <FormField control={form.control} name={nombre} render={({ field }) => (
     <FormItem className="flex items-center justify-between border p-4">
       <FormLabel className="text-base">{label}</FormLabel>
       <FormControl>
         <Switch
           checked={field.value}
-          onCheckedChange={(checked) => form.setValue(name, checked)}
+          onCheckedChange={(checked) => form.setValue(nombre, checked)}
         />
       </FormControl>
     </FormItem>

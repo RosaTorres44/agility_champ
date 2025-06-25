@@ -1,22 +1,28 @@
+
 import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
+// 🔹 Obtener todas las escuelas
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const query = "SELECT c.id_grado AS id, c.des_grado AS Nombre,  c.des_grado AS Nombre, c.flg_activo AS active FROM grado c ORDER BY c.id_grado ASC";
-    console.log("Executing query:", query); // Depuración
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo") || "1";
 
-    const [rows] = await pool.query(query);
+    const query = `
+      SELECT c.id_grado AS id, 
+      c.des_grado AS nombre,   
+      c.flg_activo AS flg_activo 
+      FROM grado c 
+      ORDER BY c.id_grado ASC
+    `;
 
-    if (Array.isArray(rows) && rows.length === 0) {
-      console.warn("No se encontraron grado en la base de datos.");
-    }
+    const [rows] = await pool.query(query, [flg_activo]);
 
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al obtener las grado:", error);
+    console.error("Error al obtener las categorías:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
@@ -28,14 +34,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("Datos recibidos en POST:", body); // 🔹 Verifica los datos
 
-    const { name, active } = body;
+    const { nombre, flg_activo } = body;
 
-    if (!name || typeof active !== "boolean") {
+    if (!nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `INSERT INTO grado (des_grado, flg_activo) VALUES (?, ?)`;
-    await pool.query(query, [name, active ? 1 : 0]);
+    await pool.query(query, [nombre, flg_activo ? 1 : 0]);
 
     return NextResponse.json({ message: "grado registrada con éxito" });
   } catch (error) { 
@@ -46,9 +52,9 @@ export async function POST(req: Request) {
 // 🔹 Actualizar una grado existente
 export async function PUT(req: Request) {
   try {
-    const { id, name, active } = await req.json();
+    const { id, nombre, flg_activo } = await req.json();
 
-    if (!id || !name || typeof active !== "boolean") {
+    if (!id || !nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -58,7 +64,7 @@ export async function PUT(req: Request) {
       WHERE id_grado= ?
     `;
 
-    const [result]: any = await pool.query(query, [name, active ? 1 : 0, id]);
+    const [result]: any = await pool.query(query, [nombre, flg_activo ? 1 : 0, id]);
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "grado no encontrada" }, { status: 404 });

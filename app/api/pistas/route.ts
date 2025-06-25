@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     let query = `
       SELECT 
         p.id_pista,
-        p.des_pista as Nombre, 
+        p.des_pista as nombre, 
         p.id_competencia,
         c.des_competencia AS competencia,
         p.id_grado,
@@ -28,8 +28,7 @@ export async function GET(req: Request) {
         p.num_tiempo_maximo,
         p.num_tiempo_minimo,
         p.des_tipo,
-        p.flg_activo AS active,
-        p.fec_creacion
+        p.flg_activo AS flg_activo 
       FROM pista p
       LEFT JOIN competencia c ON p.id_competencia = c.id_competencia
       LEFT JOIN grado g ON p.id_grado = g.id_grado
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
       parseFloat(body.num_tiempo_maximo),
       parseFloat(body.num_tiempo_minimo),
       body.des_tipo,
-      body.active ? 1 : 0,
+      body.flg_activo ? 1 : 0,
     ];
 
     const result: any = await pool.query(query, values);
@@ -142,7 +141,7 @@ export async function PUT(req: Request) {
       parseFloat(body.num_tiempo_maximo),
       parseFloat(body.num_tiempo_minimo),
       body.des_tipo,
-      body.active ? 1 : 0,
+      body.flg_activo ? 1 : 0,
       parseInt(body.id),
     ];
 

@@ -13,13 +13,13 @@ export async function GET(req: Request) {
     const query = `
         SELECT 
         p.id_persona AS id,
-        p.des_nombres AS Nombre,
-        p.des_apellidos AS Apellidos,
+        p.des_nombres AS nombre,
+        p.des_apellidos AS apellidos,
         p.fec_nacimiento,
         p.flg_sexo,
         p.des_correo AS email,
         p.des_rol AS role,
-        p.flg_activo AS active
+        p.flg_activo AS flg_activo
       FROM agilitychamp.persona p 
     `;
 
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("📥 Datos recibidos en POST:", body);
 
-    const { name, lastname, birthdate, flg_sexo, email, role, active } = body;
+    const { nombre, lastname, birthdate, flg_sexo, email, role, flg_activo } = body;
 
-    if (!name || !lastname || !email || typeof active !== "boolean") {
+    if (!nombre || !lastname || !email || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -58,13 +58,13 @@ export async function POST(req: Request) {
     `;
 
     await pool.query(query, [
-      name,
+      nombre,
       lastname,
       birthdate,
       flg_sexo,
       email,
       role,
-      active ? 1 : 0,
+      flg_activo ? 1 : 0,
     ]);
 
     return NextResponse.json({ message: "Persona registrada con éxito" });
@@ -78,9 +78,9 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { id, name, lastname, birthdate, flg_sexo, email, role, active } = body;
+    const { id, nombre, apellidos, birthdate, flg_sexo, email, role, flg_activo } = body;
 
-    if (!id || !name || !lastname || !email || typeof active !== "boolean") {
+    if (!id || !nombre || !apellidos || !email || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -98,13 +98,13 @@ export async function PUT(req: Request) {
     `;
 
     const [result]: any = await pool.query(query, [
-      name,
-      lastname,
+      nombre,
+      apellidos,
       birthdate,
       flg_sexo,
       email,
       role,
-      active ? 1 : 0,
+      flg_activo ? 1 : 0,
       id
     ]);
 

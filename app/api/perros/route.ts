@@ -1,32 +1,41 @@
+
 import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
-// 🔹 Obtener todos los perros
-export async function GET() {
+// 🔹 Obtener todas las escuelas
+
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo") || "1";
+
     const query = `
-      SELECT 
+  SELECT 
         p.id_perro AS id,
-        p.des_nombres AS Nombre,
+        p.des_nombres AS nombre,
         p.fec_nacimiento AS fec_nacimiento,
         p.flg_sexo AS sexo,
         p.des_chip AS chip,
         p.id_raza AS id_raza,
         r.des_raza AS raza,
-        p.flg_activo AS active
+        p.flg_activo AS flg_activo
       FROM perro p
-      INNER JOIN raza r ON p.id_raza = r.id_raza
+      INNER JOIN raza r 
+      ON p.id_raza = r.id_raza
       WHERE r.flg_activo = 1
+
     `;
-    const [rows] = await pool.query(query);
+
+    const [rows] = await pool.query(query, [flg_activo]);
+
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al obtener perros:", error);
+    console.error("Error al obtener las categorías:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
-
+ 
 // 🔹 Insertar un nuevo perro
 export async function POST(req: Request) {
   try {
@@ -34,22 +43,22 @@ export async function POST(req: Request) {
     console.log("Datos recibidos en POST:", body);
 
     const {
-      Nombre,
+      nombre,
       fec_nacimiento,
       sexo,
       chip,
       id_raza,
-      active,
+      flg_activo,
     } = body;
 
     // Validación simple
     if (
-      !Nombre ||
+      !nombre ||
       !fec_nacimiento ||
       (sexo !== 0 && sexo !== 1) ||
       !chip ||
       !id_raza ||
-      typeof active !== "boolean"
+      typeof flg_activo !== "boolean"
     ) {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
@@ -61,12 +70,12 @@ export async function POST(req: Request) {
     `;
 
     await pool.query(query, [
-      Nombre,
+      nombre,
       fec_nacimiento,
       parseInt(sexo),
       chip,
       parseInt(id_raza),
-      active ? 1 : 0,
+      flg_activo ? 1 : 0,
     ]);
 
     return NextResponse.json({ message: "Perro registrado con éxito" });

@@ -12,8 +12,8 @@ export async function GET(req: Request) {
     const query = `
       SELECT 
         r.id_raza AS id,
-        r.des_raza AS name,
-        r.flg_activo AS active
+        r.des_raza AS nombre,
+        r.flg_activo AS flg_activo
       FROM raza r
     `;
 
@@ -30,14 +30,14 @@ export async function GET(req: Request) {
 // 🔹 Insertar una nueva raza
 export async function POST(req: Request) {
   try {
-    const { name, active } = await req.json();
+    const { nombre, flg_activo } = await req.json();
 
-    if (!name || typeof active !== "boolean") {
+    if (!nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
     const query = `INSERT INTO raza (des_raza, flg_activo) VALUES (?, ?)`;
-    await pool.query(query, [name, active ? 1 : 0]);
+    await pool.query(query, [nombre, flg_activo ? 1 : 0]);
 
     return NextResponse.json({ message: "Raza registrada con éxito" });
   } catch (error) { 
@@ -49,9 +49,9 @@ export async function POST(req: Request) {
 // 🔹 Actualizar una raza existente
 export async function PUT(req: Request) {
   try {
-    const { id, name, active } = await req.json();
+    const { id, nombre, flg_activo } = await req.json();
 
-    if (!id || !name || typeof active !== "boolean") {
+    if (!id || !nombre || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
       WHERE id_raza = ?
     `;
 
-    const [result]: any = await pool.query(query, [name, active ? 1 : 0, id]);
+    const [result]: any = await pool.query(query, [nombre, flg_activo ? 1 : 0, id]);
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Raza no encontrada" }, { status: 404 });
