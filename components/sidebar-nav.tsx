@@ -6,11 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { Users, Trophy, School, MapPin, Users2, Dog, Bone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
-  const searchParams = useSearchParams();
-  const currentView = searchParams.get("view") || "usuarios"; // Obtiene el parámetro "view"
+interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
+  onSelect?: () => void;
+}
 
-  // Definimos las secciones del menú
+export function SidebarNav({ className, onSelect, ...props }: SidebarNavProps) {
+  const searchParams = useSearchParams();
+  const currentView = searchParams.get("view") || "usuarios";
+
   const navItems = [
     { href: "escuelas", title: "Escuelas", icon: School },
     { href: "categorias", title: "Categorias", icon: School },
@@ -33,8 +36,9 @@ export function SidebarNav({ className, ...props }: React.HTMLAttributes<HTMLEle
           className={cn(
             "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all",
             "hover:bg-[#F4F4F5] hover:text-[#6366F1]",
-            currentView === href && "bg-[#6366F1] text-white" // 🔹 Resaltar seleccionado
+            currentView === href && "bg-[#6366F1] text-white"
           )}
+          onClick={onSelect} // 👉 se ejecuta al hacer clic
         >
           <Icon className="h-4 w-4" />
           {title}

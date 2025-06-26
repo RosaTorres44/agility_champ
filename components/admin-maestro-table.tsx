@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { PencilIcon } from "lucide-react"; // 🔹 Asegurar que sea el nombre correcto
+import { PencilIcon } from "lucide-react";
 
 interface BaseEntidad {
   id: number;
@@ -38,8 +38,6 @@ interface Competencia extends BaseEntidad {
   fec_fin: string;
 }
 
-
-
 interface Dupla extends BaseEntidad {
   idPersona: number;
   idPerro: number;
@@ -51,14 +49,11 @@ type Entidad = BaseEntidad | Persona | Perro | Dupla;
 
 interface TableProps {
   entityType: string;
-  entities: any[]; // 🔹 Permitir cualquier tipo de entidad temporalmente
-  onEdit: (entity: any) => void; // 🔹 Evita errores de tipado en `dispatch`
+  entities: any[];
+  onEdit: (entity: any) => void;
 }
 
-
-
 export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) {
-  // 🔹 Definir columnas dinámicas según el tipo de entidad
   const columns = (() => {
     switch (entityType.toLowerCase()) {
       case "personas":
@@ -88,64 +83,79 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
         </TableHeader>
         <TableBody>
           {entities.length > 0 ? (
-            entities.map((entity) => (
-              <TableRow key={entity.id}>
-                <TableCell>
-                  <Checkbox checked={entity.flg_activo} className="border-[#D1D5DB]" />
-                </TableCell>
+            entities.map((entity) => {
+              const lowerEntity = entityType.toLowerCase();
 
-                {/* 🔹 Render dinámico de columnas */}
-                {entityType.toLowerCase() === "personas" && (
-                  <>
-                    <TableCell>{(entity as Persona).nombre}</TableCell>
-                    <TableCell>{(entity as Persona).apellidos}</TableCell>
-                    <TableCell>{(entity as Persona).fec_nacimiento}</TableCell>
-                    <TableCell>{(entity as Persona).role}</TableCell>
-                  </>
-                )}
+              // 🔧 Transformar claves para que el form herede bien
+              const transformedEntity =
+                lowerEntity === "personas"
+                  ? {
+                      ...entity,
+                      apellido: entity.apellidos,
+                      rol: entity.role,
+                      sexo: String(entity.flg_sexo), // ✅ corregido según nombre real
+                      fec_nacimiento: entity.fec_nacimiento?.slice(0, 10), // ✅ formato YYYY-MM-DD
+                    }
+                  : entity;
 
-                {entityType.toLowerCase() === "perros" && (
-                  <>
-                    <TableCell>{(entity as Perro).nombre}</TableCell>
-                    <TableCell>{(entity as Perro).raza}</TableCell>
-                    <TableCell>{(entity as Perro).fec_nacimiento}</TableCell>
-                    <TableCell>{(entity as Perro).chip}</TableCell>
-                  </>
-                )}
 
-                {entityType.toLowerCase() === "competencias" && (
-                  <>
-                    <TableCell>{(entity as Competencia).nombre}</TableCell>
-                    <TableCell>{(entity as Competencia).escuela}</TableCell>
-                    <TableCell>{(entity as Competencia).fec_inicio}</TableCell>
-                    <TableCell>{(entity as Competencia).fec_fin}</TableCell> 
-                  </>
-                )}
+              return (
+                <TableRow key={entity.id}>
+                  <TableCell>
+                    <Checkbox checked={entity.flg_activo} className="border-[#D1D5DB]" />
+                  </TableCell>
 
-                {entityType.toLowerCase() === "dupla" && (
-                  <>
-                    <TableCell>{(entity as Dupla).idPersona}</TableCell>
-                    <TableCell>{(entity as Dupla).idPerro}</TableCell>
-                    <TableCell>{(entity as Dupla).idGrado}</TableCell>
-                    <TableCell>{(entity as Dupla).idCategoria}</TableCell>
-                  </>
-                )}
+                  {lowerEntity === "personas" && (
+                    <>
+                      <TableCell>{entity.nombre}</TableCell>
+                      <TableCell>{entity.apellidos}</TableCell>
+                      <TableCell>{entity.fec_nacimiento}</TableCell>
+                      <TableCell>{entity.role}</TableCell>
+                    </>
+                  )}
 
-                {/* 🔹 Para entidades simples como categorías, grados , escuelas y razas */}
-                {["categorias", "grados", "escuelas", "razas"].includes(entityType.toLowerCase()) && (
-                  <TableCell>{(entity as BaseEntidad & { nombre: string }).nombre}</TableCell>
-                )}
+                  {lowerEntity === "perros" && (
+                    <>
+                      <TableCell>{entity.nombre}</TableCell>
+                      <TableCell>{entity.raza}</TableCell>
+                      <TableCell>{entity.fec_nacimiento}</TableCell>
+                      <TableCell>{entity.chip}</TableCell>
+                    </>
+                  )}
 
-                <TableCell>
-                  <Button
-                    className="bg-[#6366F1] hover:bg-[#4F46E5]"
-                    onClick={() => onEdit(entity)}
-                  >
-                    <PencilIcon className="w-4 h-4 text-white" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
+                  {lowerEntity === "competencias" && (
+                    <>
+                      <TableCell>{entity.nombre}</TableCell>
+                      <TableCell>{entity.escuela}</TableCell>
+                      <TableCell>{entity.fec_inicio}</TableCell>
+                      <TableCell>{entity.fec_fin}</TableCell>
+                    </>
+                  )}
+
+                  {lowerEntity === "duplas" && (
+                    <>
+                      <TableCell>{entity.idPersona}</TableCell>
+                      <TableCell>{entity.idPerro}</TableCell>
+                      <TableCell>{entity.idGrado}</TableCell>
+                      <TableCell>{entity.idCategoria}</TableCell>
+                    </>
+                  )}
+
+                  {["categorias", "grados", "escuelas", "razas"].includes(lowerEntity) && (
+                    <TableCell>{entity.nombre}</TableCell>
+                  )}
+
+                  <TableCell>
+                    <Button
+                      className="bg-[#6366F1] hover:bg-[#4F46E5]"
+                      onClick={() => onEdit(transformedEntity)}
+                    >
+                      <PencilIcon className="w-4 h-4 text-white" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length + 2} className="text-center text-gray-500 py-4">

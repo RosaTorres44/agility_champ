@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
-// 🔹 Obtener todas las escuelas
+// 🔹 Obtener todas las perros
 
 export async function GET(req: Request) {
   try {
@@ -81,6 +81,62 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Perro registrado con éxito" });
   } catch (error) {
     console.error("Error al insertar perro:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}
+// 🔹 Actualizar un perro existente
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    console.log("📥 Datos recibidos en PUT:", body);
+
+    const {
+      id,
+      nombre,
+      fec_nacimiento,
+      sexo,
+      chip,
+      id_raza,
+      flg_activo,
+    } = body;
+
+    if (
+      !id ||
+      !nombre ||
+      !fec_nacimiento ||
+      (sexo !== 0 && sexo !== 1) ||
+      !chip ||
+      !id_raza ||
+      typeof flg_activo !== "boolean"
+    ) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+
+    const query = `
+      UPDATE perro
+      SET
+        des_nombres = ?,
+        fec_nacimiento = ?,
+        flg_sexo = ?,
+        des_chip = ?,
+        id_raza = ?,
+        flg_activo = ?
+      WHERE id_perro = ?
+    `;
+
+    await pool.query(query, [
+      nombre,
+      fec_nacimiento,
+      parseInt(sexo),
+      chip,
+      parseInt(id_raza),
+      flg_activo ? 1 : 0,
+      id,
+    ]);
+
+    return NextResponse.json({ message: "🐶 Perro actualizado con éxito" });
+  } catch (error) {
+    console.error("❌ Error al actualizar perro:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
