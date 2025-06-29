@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { LoginButton } from "@/components/LoginButton";
 
 interface NavProps {
   className?: string;
@@ -83,12 +84,10 @@ export function Nav({ className }: NavProps) {
             </div>
           )}
 
-          {/* Botón de Login en pantallas grandes */}
-          {!isMobile && (
-            <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700">
-              Ingresar
-            </Button>
-          )}
+        {/* Botón de Login en pantallas grandes */}
+        {!isMobile && <LoginButton />}
+
+
 
           {/* Botón de hamburguesa en móviles */}
           {isMobile && (
@@ -118,9 +117,8 @@ export function Nav({ className }: NavProps) {
             <Link href="/admin?view=resultados" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" onClick={() => setMenuOpen(false)}>
               Administrar
             </Link>
-            <Button variant="default" className="w-full mt-2 bg-indigo-600 hover:bg-indigo-700" onClick={() => setMenuOpen(false)}>
-              Ingresar
-            </Button>
+            <LoginButton onLoginClick={() => setMenuOpen(false)} />
+
           </div>
         </div>
       )}
