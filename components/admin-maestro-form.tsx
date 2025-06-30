@@ -16,8 +16,9 @@ const esquemaGenerico = z.object({
 
 const esquemaPersona = z.object({
   nombre: z.string().min(2),
-  Apellidos: z.string().min(2),
+  apellidos: z.string().min(2),
   flg_sexo: z.union([z.literal("0"), z.literal("1")]),
+  email: z.string().email("Correo electrónico inválido").optional(),
   fec_nacimiento: z.string(),
   role: z.string(),
   flg_activo: z.boolean(),
@@ -71,10 +72,11 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
     defaultValues: isPersona
       ? {
           nombre: "",
-          Apellidos: "",
+          apellidos: "",
           flg_sexo: "0",
           fec_nacimiento: "",
           role: "Usuario",
+          email: "",
           flg_activo: true,
         }
       : isPerro
@@ -133,10 +135,11 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         isPersona
           ? {
               nombre: selectedEntity.nombre || "",
-              Apellidos: selectedEntity.Apellidos || "",
+              apellidos: selectedEntity.apellidos || "",
               flg_sexo: String(selectedEntity.flg_sexo ?? "0"),
               fec_nacimiento: selectedEntity.fec_nacimiento?.slice(0, 10) || "",
               role: selectedEntity.role || "Usuario",
+              email: selectedEntity.email || "",
               flg_activo: selectedEntity.flg_activo === 1,
             }
           : isPerro
@@ -173,10 +176,11 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         body = {
           id: selectedEntity?.id,
           nombre: values.nombre,
-          apellidos: values.Apellidos,
+          apellidos: values.apellidos,
           birthdate: values.fec_nacimiento,
           flg_sexo: Number(values.flg_sexo),
           role: values.role,
+          email: values.email,
           flg_activo: values.flg_activo,
         };
       } else if (isPerro) {
@@ -218,9 +222,10 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         {isPersona ? (
           <>
             {renderCampo(form, "nombre", "Nombres")}
-            {renderCampo(form, "Apellidos", "Apellidos")}
+            {renderCampo(form, "apellidos", "apellidos")}
             {renderCampo(form, "fec_nacimiento", "F. Nacimiento", "date")}
             {renderSelect(form, "flg_sexo", "Sexo", sexoOptions)}
+            {renderCampo(form, "email", "Correo electrónico")}
             {renderSelect(form, "role", "Rol", roleOptions)}
           </>
         ) : isPerro ? (

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { LoginButton } from "@/components/LoginButton";
+import { useSession } from "next-auth/react";
 
 interface NavProps {
   className?: string;
@@ -14,8 +15,11 @@ interface NavProps {
 
 export function Nav({ className }: NavProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const isJuez = session?.user?.role === "Juez";
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -73,22 +77,23 @@ export function Nav({ className }: NavProps) {
               >
                 Mi Desempeño
               </Link>
-              <Link
-                href="/admin?view=resultados"
-                className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
-                  pathname === "/admin" ? "text-indigo-600" : "text-gray-500"
-                }`}
-              >
-                Administrar
-              </Link>
+
+              {isJuez && (
+                <Link
+                  href="/admin?view=resultados"
+                  className={`px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-50 ${
+                    pathname === "/admin" ? "text-indigo-600" : "text-gray-500"
+                  }`}
+                >
+                  Administrar
+                </Link>
+              )}
             </div>
           )}
 
-        {/* Botón de Login en pantallas grandes */}
-        {!isMobile && <LoginButton />}
-
-
-
+          {/* Botón de Login en pantallas grandes */}
+          {!isMobile && <LoginButton />}
+          
           {/* Botón de hamburguesa en móviles */}
           {isMobile && (
             <button
@@ -114,11 +119,12 @@ export function Nav({ className }: NavProps) {
             <Link href="/performance" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" onClick={() => setMenuOpen(false)}>
               Mi Desempeño
             </Link>
-            <Link href="/admin?view=resultados" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" onClick={() => setMenuOpen(false)}>
-              Administrar
-            </Link>
+            {isJuez && (
+              <Link href="/admin?view=resultados" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" onClick={() => setMenuOpen(false)}>
+                Administrar
+              </Link>
+            )}
             <LoginButton onLoginClick={() => setMenuOpen(false)} />
-
           </div>
         </div>
       )}

@@ -4,14 +4,15 @@ import { pool } from "@/data/db";
 export const dynamic = "force-dynamic";
 
 // 🔹 Obtener todas las personas
-
+// 🔹 Obtener personas (todas o por correo)
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const flg_activo = searchParams.get("flg_activo") || "1";
+    const flg_activo = searchParams.get("flg_activo");
+    const correo = searchParams.get("correo");
 
-    const query = `
-        SELECT 
+    let query = `
+      SELECT 
         p.id_persona AS id,
         p.des_nombres AS nombre,
         p.des_apellidos AS apellidos,
@@ -20,14 +21,27 @@ export async function GET(req: Request) {
         p.des_correo AS email,
         p.des_rol AS role,
         p.flg_activo AS flg_activo
-      FROM agilitychamp.persona p 
+      FROM agilitychamp.persona p
+      WHERE 1 = 1
     `;
 
-    const [rows] = await pool.query(query, [flg_activo]);
+    const values: any[] = [];
+
+    if (correo) {
+      query += ` AND p.des_correo = ?`;
+      values.push(correo);
+    }
+
+    if (flg_activo !== null && flg_activo !== undefined) {
+      query += ` AND p.flg_activo = ?`;
+      values.push(Number(flg_activo));
+    }
+
+    const [rows] = await pool.query(query, values);
 
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al obtener las categorías:", error);
+    console.error("❌ Error al obtener personas:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
@@ -39,31 +53,30 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("📥 Datos recibidos en POST:", body);
 
-    const { nombre, lastname, birthdate, flg_sexo, email, role, flg_activo } = body;
+    const { nombre, apellidos, birthdate, flg_sexo, email, role, flg_activo } = body;
 
-    if (!nombre || !lastname || !email || typeof flg_activo !== "boolean") {
+    if (!nombre || !apellidos || !email || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
-
     const query = `
       INSERT INTO agilitychamp.persona (
         des_nombres,
         des_apellidos,
         fec_nacimiento,
         flg_sexo,
-        des_correo,
         des_rol,
+        des_correo,
         flg_activo
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     await pool.query(query, [
       nombre,
-      lastname,
+      apellidos,
       birthdate,
       flg_sexo,
-      email,
       role,
+      email,
       flg_activo ? 1 : 0,
     ]);
 
@@ -78,9 +91,9 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { id, nombre, apellidos, birthdate, flg_sexo, email, role, flg_activo } = body;
+    const { id, nombre, lastname, birthdate, flg_sexo, email, role, flg_activo } = body;
 
-    if (!id || !nombre || !apellidos || !email || typeof flg_activo !== "boolean") {
+    if (!id || !nombre || !lastname || !email || typeof flg_activo !== "boolean") {
       return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
     }
 
@@ -99,7 +112,7 @@ export async function PUT(req: Request) {
 
     const [result]: any = await pool.query(query, [
       nombre,
-      apellidos,
+      lastname,
       birthdate,
       flg_sexo,
       email,

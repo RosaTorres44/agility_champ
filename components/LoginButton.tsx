@@ -33,7 +33,7 @@ export function LoginButton({ onLoginClick }: Props) {
       }}
       className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-md"
     >
-      Iniciar sesión con Google
+      Iniciar sesión
     </Button>
   );
 }

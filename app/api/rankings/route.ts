@@ -31,7 +31,7 @@ export async function GET() {
         END);
     `;
 
-    console.log("Executing query:", query); // Depuración
+    //console.log("Executing query:", query); // Depuración
 
     const [rows] = await pool.query(query);
 

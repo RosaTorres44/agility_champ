@@ -10,7 +10,7 @@ export async function GET() {
 
     `;
 
-    console.log("Executing query:", query); // Depuración
+    //console.log("Executing query:", query); // Depuración
 
     // 🔹 Corrección: Obtener filas correctamente
     const [rows]: any = await pool.query(query);

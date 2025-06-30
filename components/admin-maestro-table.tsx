@@ -21,6 +21,7 @@ interface Persona extends BaseEntidad {
   nombre: string;
   apellidos: string;
   fec_nacimiento: string;
+  email: string;
   role: string;
 }
 
@@ -57,7 +58,7 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
   const columns = (() => {
     switch (entityType.toLowerCase()) {
       case "personas":
-        return ["Nombres", "Apellidos", "F. Nacimiento", "Rol"];
+        return ["Nombres", "Apellidos", "F. Nacimiento", ,"Mail", "Rol"];
       case "perros":
         return ["Nombre", "Raza", "F. Nacimiento", "Chip"];
       case "competencias":
@@ -93,6 +94,7 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
                       ...entity,
                       apellido: entity.apellidos,
                       rol: entity.role,
+                      email: entity.email,
                       sexo: String(entity.flg_sexo), // ✅ corregido según nombre real
                       fec_nacimiento: entity.fec_nacimiento?.slice(0, 10), // ✅ formato YYYY-MM-DD
                     }
@@ -110,6 +112,7 @@ export function AdminMaestroTabla({ entityType, entities, onEdit }: TableProps) 
                       <TableCell>{entity.nombre}</TableCell>
                       <TableCell>{entity.apellidos}</TableCell>
                       <TableCell>{entity.fec_nacimiento}</TableCell>
+                      <TableCell>{entity.email}</TableCell>
                       <TableCell>{entity.role}</TableCell>
                     </>
                   )}
