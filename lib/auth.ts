@@ -1,12 +1,12 @@
-// 📁 lib/auth.ts
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 import { pool } from "@/data/db";
+import bcrypt from "bcryptjs";
 import { Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
-// Extendemos el tipado de sesión y token
+// Tipado extendido
 declare module "next-auth" {
   interface Session {
     user: {
@@ -64,10 +64,13 @@ export const authOptions: NextAuthOptions = {
           const [rows]: any = await pool.query(query, [email]);
 
           if (!rows.length) return null;
-          const user = rows[0];
 
+          const user = rows[0];
           if (user.flg_activo === 0) return null;
-          if (user.hash_password !== password) return null;
+
+          // ✅ Comparar password con bcrypt
+          const isValid = await bcrypt.compare(password, user.hash_password);
+          if (!isValid) return null;
 
           return {
             id: user.id.toString(),
@@ -88,7 +91,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google" && user?.email) {
-    
         const query = `
           SELECT 
             id_persona AS id,
