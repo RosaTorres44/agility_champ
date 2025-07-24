@@ -43,12 +43,21 @@ const esquemaCompetencia = z.object({
 
 interface DynamicFormProps {
   entityType: string;
-  reloadData: () => void;
+  reloadData?: () => void;
   selectedEntity?: any | null;
-  onCancel: () => void;
+  onCancel?: () => void;
+  defaultValues?: any;
+  isFromRegistro?: boolean;
 }
 
-export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity, onCancel }: DynamicFormProps) {
+export function DynamicForm({
+  entityType = "Entidad",
+  reloadData = () => {},
+  selectedEntity,
+  onCancel = () => {},
+  defaultValues,
+  isFromRegistro = false,
+}: DynamicFormProps) {
   const key = entityType.toLowerCase();
   const isPersona = key === "personas";
   const isPerro = key === "perros";
@@ -69,7 +78,7 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
 
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: isPersona
+    defaultValues: defaultValues || (isPersona
       ? {
           nombre: "",
           apellidos: "",
@@ -99,7 +108,7 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
       : {
           nombre: "",
           flg_activo: true,
-        },
+        }),
     mode: "onChange",
   });
 
@@ -176,24 +185,38 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         body = {
           id: selectedEntity?.id,
           nombre: values.nombre,
-          apellidos: values.apellidos,
+          lastname: values.apellidos, // ✅ cambio aquí
           birthdate: values.fec_nacimiento,
           flg_sexo: Number(values.flg_sexo),
           role: values.role,
           email: values.email,
           flg_activo: values.flg_activo,
         };
-      } else if (isPerro) {
+      }
+      
+      else if (isPerro) {
         body = {
           id: selectedEntity?.id,
           nombre: values.nombre,
           fec_nacimiento: values.fec_nacimiento,
-          sexo: parseInt(values.sexo),
+          sexo: parseInt(values.sexo), // Convertir a número
           chip: values.chip,
-          id_raza: parseInt(values.id_raza),
+          id_raza: parseInt(values.id_raza), // Convertir a número
+          flg_activo: values.flg_activo,
+        };
+      } else if (isCompetencia) {
+        body = {
+          id: selectedEntity?.id,
+          nombre: values.nombre,
+          id_escuela: parseInt(values.id_escuela), // Convertir a número
+          fec_inicio: values.fec_inicio,
+          fec_fin: values.fec_fin,
           flg_activo: values.flg_activo,
         };
       }
+
+      // Depuración: Mostrar el contenido del formulario antes de enviarlo
+      console.log("📤 Payload enviado al backend:", body);
 
       const url = `/api/${entityType.toLowerCase()}`;
       const response = await fetch(url, {
@@ -208,10 +231,15 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         alert(`❌ Error: ${data.error}`);
       } else {
         alert(selectedEntity ? `✅ ${entityType} actualizada exitosamente` : `✅ ${entityType} agregada exitosamente`);
-        reloadData();
-        onCancel();
+        if (isFromRegistro) {
+          window.location.href = "/";
+        } else {
+          reloadData();
+          onCancel();
+        }
       }
     } catch (error) {
+      console.error("❌ Error al enviar los datos:", error); // Depuración de errores
       alert(`❌ Hubo un problema al registrar la ${entityType.toLowerCase()}`);
     }
   };
@@ -222,7 +250,7 @@ export function DynamicForm({ entityType = "Entidad", reloadData, selectedEntity
         {isPersona ? (
           <>
             {renderCampo(form, "nombre", "Nombres")}
-            {renderCampo(form, "apellidos", "apellidos")}
+            {renderCampo(form, "apellidos", "Apellidos")}
             {renderCampo(form, "fec_nacimiento", "F. Nacimiento", "date")}
             {renderSelect(form, "flg_sexo", "Sexo", sexoOptions)}
             {renderCampo(form, "email", "Correo electrónico")}

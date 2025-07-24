@@ -47,7 +47,7 @@ function reducer(state: AdminState, action: AdminAction): AdminState {
   }
 }
 
-export function Admin() {
+export default function AdminComponent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,7 +57,7 @@ export function Admin() {
 
   const role = session?.user?.role || "";
   const allowedViews =
-    role === "ADMIN" ? ADMIN_ALLOWED : role === "JUEZ" ? JUEZ_ALLOWED : [];
+    role === "Admin" ? ADMIN_ALLOWED : role === "Juez" ? JUEZ_ALLOWED : [];
 
   const pageTitle = TITLES[entityType] ?? "Administrar";
 
@@ -144,11 +144,9 @@ export function Admin() {
     }
   }, [entityType, rawView]);
 
-  // ✅ Verifica acceso y carga data en un solo efecto
   useEffect(() => {
     if (status === "authenticated") {
       const allowed = allowedViews.includes(entityType);
-
       if (!allowed) {
         router.replace("/");
       } else {

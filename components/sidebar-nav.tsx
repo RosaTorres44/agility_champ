@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Users, Trophy, School, MapPin, Users2, Dog, Bone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   onSelect?: () => void;
@@ -13,6 +14,9 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 export function SidebarNav({ className, onSelect, ...props }: SidebarNavProps) {
   const searchParams = useSearchParams();
   const currentView = searchParams.get("view") || "usuarios";
+  const { data: session } = useSession();
+
+  const role = session?.user?.role || "";
 
   const navItems = [
     { href: "escuelas", title: "Escuelas", icon: School },
@@ -27,9 +31,19 @@ export function SidebarNav({ className, onSelect, ...props }: SidebarNavProps) {
     { href: "resultados", title: "Resultados", icon: Bone },
   ];
 
+  const allowedForJuez = ["pistas", "resultados"];
+
+  // Filtrar secciones según el rol
+  const filteredNavItems =
+    role === "Admin"
+      ? navItems
+      : role === "Juez"
+      ? navItems.filter((item) => allowedForJuez.includes(item.href))
+      : [];
+
   return (
     <nav className={cn("flex flex-col space-y-1", className)} {...props}>
-      {navItems.map(({ href, title, icon: Icon }) => (
+      {filteredNavItems.map(({ href, title, icon: Icon }) => (
         <Link
           key={href}
           href={`/admin?view=${href}`}
@@ -38,7 +52,7 @@ export function SidebarNav({ className, onSelect, ...props }: SidebarNavProps) {
             "hover:bg-[#F4F4F5] hover:text-[#6366F1]",
             currentView === href && "bg-[#6366F1] text-white"
           )}
-          onClick={onSelect} // 👉 se ejecuta al hacer clic
+          onClick={onSelect}
         >
           <Icon className="h-4 w-4" />
           {title}

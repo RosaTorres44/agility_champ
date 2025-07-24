@@ -28,7 +28,7 @@ export function LoginButton({ onLoginClick }: Props) {
   return (
     <Button
       onClick={() => {
-        signIn("google");
+        signIn();
         onLoginClick?.();
       }}
       className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-md"

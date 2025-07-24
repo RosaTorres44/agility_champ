@@ -2,9 +2,9 @@
 
 import { Header_nav } from "@/components/header_nav";
 import { Nav } from "@/components/nav";
-import { Admin } from "@/components/admin";
 import { Pie } from "@/components/Pie";
 import { Suspense } from "react";
+import AdminComponent from "./AdminClient"; 
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default function AdminPage() {
       <Nav />
       <Header_nav title="Administrar" />
       <Suspense fallback={<div>Cargando...</div>}>
-        <Admin />
+        <AdminComponent />
       </Suspense>
       <Pie />
     </main>
