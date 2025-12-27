@@ -1,0 +1,9 @@
+MYSQL_DATABASE="railway" 
+MYSQL_PUBLIC_URL="mysql://root:LodKTHBiVzkrKEuwWUgDgmHeqCwFYFhs@centerbeam.proxy.rlwy.net:54838/railway"
+MYSQL_ROOT_PASSWORD="LodKTHBiVzkrKEuwWUgDgmHeqCwFYFhs"
+MYSQL_URL="mysql://root:LodKTHBiVzkrKEuwWUgDgmHeqCwFYFhs@mysql.railway.internal:3306/railway"
+MYSQLDATABASE="railway"
+MYSQLHOST="mysql.railway.internal"
+MYSQLPASSWORD="LodKTHBiVzkrKEuwWUgDgmHeqCwFYFhs"
+MYSQLPORT=3306
+MYSQLUSER="root"

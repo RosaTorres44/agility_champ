@@ -1,0 +1,63 @@
+🧱 1. Framework frontend: moderno, estable y con buena comunidad
+	•	React + Next.js 14/15  + TypeScript 
+	•	✅ Súper popular y estable
+	•	✅ Soporta SSR, SSG y Server Actions para mejor performance
+	•	✅ Ideal para apps dinámicas, dashboards, productos digitales complejos
+
+📱 2. Responsive de verdad (no solo “se ve en celular”)
+Características mínimas:
+	•	📐 Mobile-first: diseñar primero para pantallas pequeñas.
+	•	🧩 CSS Grid y Flexbox para layout flexible.
+	•	📏 Breakpoints definidos (ej. 360, 768, 1024, 1440 px).
+	•	🌗 Soporte para dark mode (opcional pero muy valorado).
+	•	🖱️ Componentes adaptativos:
+	•	Menú hamburguesa en móvil
+	•	Tablas que se vuelven cards
+	•	Formularios con inputs grandes y tocables
+Usar : 
+	•	Tailwind CSS (mi recomendación: rápido, moderno, mantiene el diseño consistente).
+
+⚡ 3. Performance y experiencia rápida
+	•	⏱️ SSR/SSG: renderizar en servidor para mejorar primer render.
+	•	💤 Lazy loading de componentes pesados (gráficos, mapas, modales).
+	•	📦 Code splitting: no enviar todo el JS en el primer load.
+	•	🖼️ Optimización de imágenes (WebP, tamaños responsivos).
+	•	🔁 Cache de datos con:
+	•	React Query / TanStack Query
+	•	O SWR con Next.js
+	•	🧠 Usar CDN para estáticos y contenido.
+
+🧪 4. Lenguaje de programación moderno
+Frontend
+	•	🔹 Next.js (React + TS)  
+Backend
+	•	🔹 Node.js + TypeScript + NestJS
+	•	Arquitectura modular, muy ordenada
+	•	Ideal para APIs REST/GraphQL
+
+
+🔄 5. Arquitectura de la app (a alto nivel)
+	•	🎯 Frontend SPA/MPA con SSR (Next/Nuxt/SvelteKit)
+	•	🌐 API REST o GraphQL para comunicar frontend ↔ backend
+	•	🗄️ Base de datos:
+	•	MySQL 
+	•	🧱 Capas claras:
+	•	UI (componentes)
+	•	Lógica de negocio
+	•	Acceso a datos
+	•	Servicios externos (pagos, mails, etc.)
+
+🛡️ 6. Seguridad, calidad y mantenimiento
+	•	🔐 Autenticación con tokens (JWT) u OIDC (Auth0, Cognito, etc.)
+	•	🚧 Validación de inputs en backend y frontend
+	•	♿ Accesibilidad: labels, contraste, navegación con teclado
+	•	✅ Testing:
+	•	Unit tests (Jest, Vitest)
+	•	Component tests (Testing Library)
+	•	E2E (Playwright / Cypress)
+	•	🔁 CI/CD:
+	•	GitHub Actions / GitLab CI para automatizar tests y despliegues
+	•	Inicio de sesion con gmail 
+
+
+

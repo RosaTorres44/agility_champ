@@ -1,0 +1,693 @@
+📦 1. Tablas del modelo de datos – Descripción funcional
+
+🗂️ Tablas maestras / catálogos
+🟣 categoria_talla
+Define la categoría por tamaño del perro. Es fija durante toda la vida deportiva del ejemplar.
+
+🟣 grado
+Representa los grados deportivos del perro (G0–G3). Se usa tanto para el estado actual del perro como para configurar pistas.
+
+🟣 tipo_pista
+Catálogo de tipos de pista:
+	•	Agility
+	•	Jumping
+	•	Requisito
+Define reglas de cálculo (ej. TMR).
+🟣 tipo_persona
+Catálogo de roles.
+
+
+
+👤 Personas y perros
+🔵 persona
+Representa a las personas del sistema:
+	•	Guías
+	•	Jueces
+	•	Otros roles futuros
+
+🔵 perro
+Información del ejemplar (perro competidor). Incluye su categoría por tamaño y su grado actual.
+
+🔵 dupla
+Relación entre perro + guía. Es la unidad competitiva que corre las pistas.
+
+
+🔵  perro_grado_historico
+
+Histórico auditable de cambios de grado.
+
+
+🏅 Organización y competencias
+🟠 organizacion
+Representa a:
+	•	Equipos
+	•	Filiales
+	•	CNA
+Puede organizar competencias.
+
+🟠 competencia
+Evento competitivo (ej. “Copa Verano 2025”).
+
+🟠 competencia_organizacion
+Tabla intermedia N a N entre competencia y organizaciones.
+
+🟠 competencia_fecha
+Modela los días de competencia (sábado / domingo).
+
+🏁 Pistas y resultados
+🟢 pista
+Define cada pista:
+	•	Longitud
+	•	Juez
+	•	Tipo (Agility / Jumping)
+	•	Grado base
+	•	TSR / TMR
+	•	Método de cálculo de TSR
+
+🟢 resultado_pista
+Resultado de una dupla corriendo una pista. Es la tabla más importante del sistema:
+	•	Tiempos
+	•	Penalidades
+	•	Eliminación
+	•	Podio
+	•	Ranking
+
+📊 Ranking
+🟣 temporada
+Define el período del ranking (ej. Ranking Nacional 2025).
+
+🟣 ranking_puntaje
+Guarda cada evento de asignación de puntos. Permite auditoría y recálculo.
+
+🧾 2. Tablas y campos (PK / FK)
+
+🟣 categoria_talla
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+cod
+VARCHAR
+Código (SMALL, MEDIUM…)
+nombre
+VARCHAR
+Nombre descriptivo
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟣 grado
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+cod
+VARCHAR
+G0, G1, G2, G3
+nombre
+VARCHAR
+Nombre del grado
+orden
+INT
+Orden jerárquico
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟣 tipo_pista
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+cod
+VARCHAR
+AGILITY, JUMPING
+nombre
+VARCHAR
+Descripción
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+
+🟣 tipo_persona
+Campo
+Tipo
+PK/FK
+Referencia
+Descripción
+id
+BIGINT
+PK
+—
+Identificador
+cod
+VARCHAR(30)
+—
+—
+JUEZ / GUIA / ADMINISTRADOR
+nombre
+VARCHAR(60)
+—
+—
+Descripción
+flg_activo
+TINYINT
+—
+—
+Activo/Inactivo
+fec_creacion
+DATETIME
+—
+—
+Creación
+fec_actualizacion
+
+
+DATETIME
+—
+—
+Actualización
+
+
+
+🔵 🔵 persona (ACTUALIZADA)
+Campo
+Tipo
+PK/FK
+Referencia
+Descripción
+id
+BIGINT
+PK
+—
+Identificador
+id_tipo_persona
+BIGINT
+FK
+tipo_persona.id
+Tipo: juez/guía/admin
+nombres
+VARCHAR(120)
+—
+—
+Nombres
+apellidos
+VARCHAR(120)
+—
+—
+Apellidos
+email
+VARCHAR(190)
+—
+—
+Email
+telefono
+VARCHAR(40)
+—
+—
+Teléfono
+flg_activo
+TINYINT
+—
+—
+Activo/Inactivo
+fec_creacion
+DATETIME
+—
+—
+Creación
+fec_actualizacion
+DATETIME
+—
+—
+Actualización
+
+
+
+
+🔵perro (ACTUALIZADA)
+Campo
+Tipo
+PK/FK
+Referencia
+Descripción
+id
+BIGINT
+PK
+—
+Identificador
+nombre
+VARCHAR(120)
+—
+—
+Nombre del perro
+fecha_nacimiento
+DATE
+—
+—
+Fecha nacimiento
+chip
+VARCHAR(80)
+—
+—
+Chip/microchip (único si se registra)
+id_categoria_talla
+BIGINT
+FK
+categoria_talla.id
+Talla
+id_grado_actual
+BIGINT
+FK
+grado.id
+Grado vigente
+observaciones
+VARCHAR(255)
+—
+—
+Notas
+flg_activo
+TINYINT
+—
+—
+Activo/Inactivo
+fec_creacion
+DATETIME
+—
+—
+Creación
+fec_actualizacion
+DATETIME
+—
+—
+Actualización
+
+
+
+
+📈 perro_grado_historico (NUEVA)
+Campo
+Tipo
+PK/FK
+Referencia
+Descripción
+id
+BIGINT
+PK
+—
+Identificador
+id_perro
+BIGINT
+FK
+perro.id
+Perro
+id_grado_anterior
+BIGINT
+FK
+grado.id
+Grado previo (nullable en primer registro)
+id_grado_nuevo
+BIGINT
+FK
+grado.id
+Nuevo grado
+fecha_cambio
+DATE
+—
+—
+Fecha del cambio
+motivo
+VARCHAR(120)
+—
+—
+Ej: “3 excelentes”
+observacion
+VARCHAR(255)
+—
+—
+Comentario extra
+id_usuario_registro
+BIGINT
+FK
+persona.id
+Quien registró (admin)
+flg_activo
+TINYINT
+—
+—
+Activo/Inactivo
+fec_creacion
+DATETIME
+—
+—
+Creación
+fec_actualizacion
+DATETIME
+—
+—
+Actualización
+
+🔵 dupla
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_perro
+BIGINT
+FK → perro.id
+id_guia_persona
+BIGINT
+FK → persona.id
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟠 organizacion
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+tipo
+VARCHAR
+EQUIPO / FILIAL / CNA
+nombre
+VARCHAR
+Nombre
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟠 competencia
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+nombre
+VARCHAR
+Nombre
+descripcion
+VARCHAR
+Detalle
+fecha_inicio
+DATE
+Inicio
+fecha_fin
+DATE
+Fin
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟠 competencia_organizacion
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_competencia
+BIGINT
+FK → competencia.id
+id_organizacion
+BIGINT
+FK → organizacion.id
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟠 competencia_fecha
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_competencia
+BIGINT
+FK → competencia.id
+dia_codigo
+VARCHAR
+SAT / SUN
+fecha
+DATE
+Fecha
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟢 pista
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_competencia
+BIGINT
+FK → competencia.id
+id_competencia_fecha
+BIGINT
+FK → competencia_fecha.id
+id_tipo_pista
+BIGINT
+FK → tipo_pista.id
+id_grado_base
+BIGINT
+FK → grado.id
+id_juez_persona
+BIGINT
+FK → persona.id
+longitud_m
+DECIMAL
+Longitud
+tsr_seg
+DECIMAL
+TSR
+tmr_seg
+DECIMAL
+TMR
+modo_tsr
+VARCHAR
+NT / MEJOR_TIEMPO
+velocidad_nt_ms
+DECIMAL
+Velocidad NT
+mejor_tiempo_ref_seg
+DECIMAL
+Tiempo ref
+velocidad_calculada_ms
+DECIMAL
+Velocidad calc
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟢 resultado_pista
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_pista
+BIGINT
+FK → pista.id
+id_dupla
+BIGINT
+FK → dupla.id
+id_perro
+BIGINT
+FK → perro.id
+categoria_competitiva
+VARCHAR
+REGULAR / SENIOR
+tiempo_cronometrado_seg
+DECIMAL
+Tiempo
+faltas
+INT
+Faltas
+rehuses
+INT
+Rehúses
+penalidad_total_seg
+DECIMAL
+Penalidad
+tiempo_total_seg
+DECIMAL
+Total
+es_eli
+BOOL
+Eliminado
+es_elegible_podio
+BOOL
+Podio
+es_elegible_ranking
+BOOL
+Ranking
+puesto
+INT
+Puesto
+puntos_ranking
+INT
+Puntos
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟣 temporada
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+anio
+INT
+Año
+nombre
+VARCHAR
+Nombre
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+🟣 ranking_puntaje
+Campo
+Tipo
+Descripción
+id
+BIGINT
+PK
+id_temporada
+BIGINT
+FK → temporada.id
+id_resultado_pista
+BIGINT
+FK → resultado_pista.id
+id_dupla
+BIGINT
+FK → dupla.id
+puntos
+INT
+Puntos
+motivo
+VARCHAR
+Motivo
+flg_activo
+BOOL
+Activo/Inactivo
+fec_creacion
+DATETIME
+Fecha creación
+fec_actualizacion
+DATETIME
+Fecha actualización
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

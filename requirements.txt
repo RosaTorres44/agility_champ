@@ -1,0 +1,4 @@
+mysql-connector-python
+pg
+npm install next-auth
+npm install bcryptjs

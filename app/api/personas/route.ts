@@ -1,0 +1,133 @@
+// 📁 app/api/personas/route.ts
+import { NextResponse } from "next/server";
+import { pool } from "@/data/db";
+export const dynamic = "force-dynamic";
+
+// 🔹 Obtener todas las personas
+// 🔹 Obtener personas (todas o por correo)
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const flg_activo = searchParams.get("flg_activo");
+    const correo = searchParams.get("correo");
+
+    let query = `
+      SELECT 
+        p.id_persona AS id,
+        p.des_nombres AS nombre,
+        p.des_apellidos AS apellidos,
+        p.fec_nacimiento,
+        p.flg_sexo,
+        p.des_correo AS email,
+        p.des_rol AS role,
+        p.flg_activo AS flg_activo
+      FROM agilitychamp.persona p
+      WHERE 1 = 1
+    `;
+
+    const values: any[] = [];
+
+    if (correo) {
+      query += ` AND p.des_correo = ?`;
+      values.push(correo);
+    }
+
+    if (flg_activo !== null && flg_activo !== undefined) {
+      query += ` AND p.flg_activo = ?`;
+      values.push(Number(flg_activo));
+    }
+
+    const [rows] = await pool.query(query, values);
+
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error("❌ Error al obtener personas:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}
+
+
+// 🔹 Insertar una nueva persona
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    console.log("📥 Datos recibidos en POST:", body);
+
+    const { nombre, apellidos, birthdate, flg_sexo, email, role, flg_activo } = body;
+
+    if (!nombre || !apellidos || !email || typeof flg_activo !== "boolean") {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+    const query = `
+      INSERT INTO agilitychamp.persona (
+        des_nombres,
+        des_apellidos,
+        fec_nacimiento,
+        flg_sexo,
+        des_rol,
+        des_correo,
+        flg_activo
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await pool.query(query, [
+      nombre,
+      apellidos,
+      birthdate,
+      flg_sexo,
+      role,
+      email,
+      flg_activo ? 1 : 0,
+    ]);
+
+    return NextResponse.json({ message: "Persona registrada con éxito" });
+  } catch (error) {
+    console.error("❌ Error al insertar persona:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}
+
+// 🔹 Actualizar una persona existente
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    const { id, nombre, lastname, birthdate, flg_sexo, email, role, flg_activo } = body;
+
+    if (!id || !nombre || !lastname || !email || typeof flg_activo !== "boolean") {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+
+    const query = `
+      UPDATE agilitychamp.persona
+      SET 
+        des_nombres = ?,
+        des_apellidos = ?,
+        fec_nacimiento = ?,
+        flg_sexo = ?,
+        des_correo = ?,
+        des_rol = ?,
+        flg_activo = ?
+      WHERE id_persona = ?
+    `;
+
+    const [result]: any = await pool.query(query, [
+      nombre,
+      lastname,
+      birthdate,
+      flg_sexo,
+      email,
+      role,
+      flg_activo ? 1 : 0,
+      id
+    ]);
+
+    if (result.affectedRows === 0) {
+      return NextResponse.json({ error: "Persona no encontrada" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Persona actualizada con éxito" });
+  } catch (error) {
+    console.error("❌ Error al actualizar persona:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}

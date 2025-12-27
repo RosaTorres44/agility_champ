@@ -1,0 +1,178 @@
+🐾 CASO DE USO – APP DE GESTIÓN DE RESULTADOS AGILITY 
+
+🎯 Objetivo del sistema
+Permitir la gestión y visualización en tiempo real de los resultados de una competencia de Agility, asegurando:
+	•	⏱️ Registro oficial de tiempos y penalidades
+	•	🧮 Cálculo automático de resultados
+	•	🏆 Definición de podio por pista
+	•	📊 Asignación de ranking nacional (cuando aplique)
+	•	🔍 Transparencia para jueces y competidores
+🟣 1. Concepto base
+	•	Dupla = perro + guía (handler)
+	•	El guía conduce al perro por un recorrido con obstáculos.
+	•	El desempeño mide:
+	•	⚡ Velocidad
+	•	🎯 Precisión
+	•	🤝 Conexión perro–guía
+
+🟠 2. Organizadores y estructura de competencia
+Organizadores
+	•	🏅 Equipos
+	•	🏅 Filiales
+	•	🏅 CNA – Consejo Nacional de Agility
+Estructura típica
+	•	📅 Dos fechas: sábado y domingo
+	•	🏁 Sábado:
+	•	Iniciantes (opcional)
+	•	Agility y Jumping según grado
+	•	🏁 Domingo:
+	•	Mismas pistas de grado
+	•	❌ No hay Iniciantes
+	•	
+
+🔵 3. Categorías (por tamaño)
+Cada perro pertenece a una sola categoría, definida por medición:
+	•	🐾 Small
+	•	🐾 Medium
+	•	🐾 Intermedio
+	•	🐾 Large
+📌 La categoría no cambia durante la vida deportiva del perro.
+🟡 3.1 Categoría Senior (NT)
+Categoría especial definida por edad del ejemplar:
+	•	🎂 Edad mínima: mayores de 8 años
+	•	🎓 Grados permitidos: solo G2 y G3
+	•	🧩 El perro mantiene su grado
+	•	🚫 No participa en ranking nacional
+	•	🏆 Tiene podio propio
+📌 Senior utiliza las mismas velocidades que G2
+🟢 4. Grados (progresión deportiva)
+	•	⭐ Grado 0 – Iniciantes (no oficial para ranking)
+	•	🥉 Grado 1 (G1)
+	•	🥈 Grado 2 (G2)
+	•	🥇 Grado 3 (G3)
+Reglas:
+	•	🔁 Al iniciar en G1, el perro no puede volver a Iniciantes
+	•	El ascenso de grado se logra al cumplir 3 excelentes exigidos por NT.
+	•	🐶 Un guía puede correr varios perros
+	•	Un perro puede correr con más de un guía, pero:
+	•	🛑 No puede repetir la misma pista dentro de una competencia.
+
+
+
+🏁 5. Pistas
+Cada pista tiene:
+	•	👨‍⚖️ Juez
+	•	📏 Longitud
+	•	🕒 TSR – Tiempo Estándar de Recorrido
+	•	🕒 TMR – Tiempo Máximo de Recorrido
+	•	🔀 Tipo: Agility / Jumping / Requisito
+	•	🔢 Separación por grado y categoría
+
+⏱️ 6. Cálculo de tiempos (TSR y TMR)
+🔵 6.1 Cuadro oficial de velocidades (NT 2025)
+Grado
+Agility (m/s)
+Jumping (m/s)
+G0 – Iniciantes
+2.5
+—
+G1
+3.5 – 4.0
+3.7 – 4.0
+G2
+3.8 – 4.2
+4.0 – 4.4
+G3
+4.2 – 4.5
+4.4 – 4.7
+Senior
+= G2
+= G2
+📌 La velocidad usada no puede ser menor a la mínima del grado.
+
+🧮 6.2 TSR – Modo 1: Velocidades NT
+	•	📐 TSR = Longitud / Velocidad elegida
+	•	La velocidad debe estar dentro del rango del grado
+
+🧮 6.3 TSR – Modo 2: Mejor tiempo
+	•	🏃 Se toma el mejor tiempo (cerado o con 1 falta)
+	•	🔢 Se ajusta: tiempo × 1.15
+	•	📐 Se calcula la velocidad
+	•	🛑 La velocidad resultante no puede ser menor a la mínima NT
+
+⏱️ 6.4 TMR (regla fija)
+	•	🟦 Agility → Longitud / 2.5
+	•	🟩 Jumping → Longitud / 3.0
+📌 El TMR no depende del TSR ni del mejor tiempo.
+
+⚠️ 7. Penalidades
+	•	❌ Falta → +5 s
+	•	🔁 Rehúse → +5 s
+	•	⏱️ Exceso TSR → tiempo − TSR
+👉 Tiempo total = tiempo cronometrado + penalidades
+❌ 8. Eliminación (ELI)
+Una dupla es ELI solo si:
+	•	Tiene 3 rehúses
+	•	Supera el TMR
+📌 La penalidad total NO elimina
+🚫 9. Regla 15.99 
+	•	✅ Penalidad ≤ 15.99
+	•	Puede entrar a podio
+	•	Puede sumar ranking
+	•	❌ Penalidad > 15.99
+	•	No entra a podio
+	•	No suma ranking
+	•	⚠️ No es ELI, la dupla completa la pista
+
+🏆 10. Podio por pista
+Orden de clasificación:
+	•	🥇 Cerados (0 penalidades)
+	•	🥈 Penalizados (≤ 15.99), por tiempo total
+📌 Un cerado siempre gana a un penalizado 📌 Empates → gana el mejor tiempo
+
+
+📊 12. Ranking Nacional (AJUSTADO – NT 2025)
+🎯 Alcance del ranking
+	•	✅ Aplica solo para Grado 2 (G2) y Grado 3 (G3)
+	•	❌ No aplica para:
+	•	Iniciantes (G0)
+	•	Grado 1 (G1)
+	•	Senior
+	•	🏆 Solo suman puntos las duplas que entran a podio
+	•	🚫 Duplas con penalidad > 15.99 o ELI → 0 puntos
+
+🟦 Ranking – Pistas de Agility
+Puesto
+Cerado (0 penalidades)
+Con penalidades (≤ 15.99)
+🥇 1.º
+10 puntos
+8 puntos
+🥈 2.º
+8 puntos
+6 puntos
+🥉 3.º
+6 puntos
+4 puntos
+
+🟩 Ranking – Pistas de Jumping
+Puesto
+Cerado (0 penalidades)
+Con penalidades (≤ 15.99)
+🥇 1.º
+7 puntos
+5 puntos
+🥈 2.º
+5 puntos
+3 puntos
+🥉 3.º
+3 puntos
+1 punto
+
+📌 Reglas complementarias de ranking
+	•	📍 El ranking no recalcula tiempos
+	•	📍 Solo toma el resultado final del podio
+	•	📍 Los puntos se acumulan por temporada
+	•	📍 En caso de empate anual:
+	•	🕒 Gana la dupla con menor tiempo total acumulado
+

@@ -1,0 +1,29 @@
+import { Pista } from './pista.entity';
+import { Dupla } from './dupla.entity';
+import { Perro } from './perro.entity';
+import { Inscripcion } from './inscripcion.entity';
+export declare class ResultadoPista {
+    id: number;
+    id_inscripcion: number;
+    inscripcion: Inscripcion;
+    id_pista: number;
+    pista: Pista;
+    id_dupla: number;
+    dupla: Dupla;
+    id_perro: number;
+    perro: Perro;
+    categoria_competitiva: string;
+    tiempo_cronometrado_seg: number;
+    faltas: number;
+    rehuses: number;
+    penalidad_total_seg: number;
+    tiempo_total_seg: number;
+    es_eli: boolean;
+    es_elegible_podio: boolean;
+    es_elegible_ranking: boolean;
+    puesto: number;
+    puntos_ranking: number;
+    flg_activo: boolean;
+    fec_creacion: Date;
+    fec_actualizacion: Date;
+}
