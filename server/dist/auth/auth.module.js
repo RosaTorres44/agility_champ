@@ -16,6 +16,7 @@ const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const google_strategy_1 = require("./strategies/google.strategy");
 const persona_entity_1 = require("../entities/persona.entity");
+const tipo_persona_entity_1 = require("../entities/tipo-persona.entity");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 let AuthModule = class AuthModule {
 };
@@ -24,7 +25,7 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             passport_1.PassportModule,
-            typeorm_1.TypeOrmModule.forFeature([persona_entity_1.Persona]),
+            typeorm_1.TypeOrmModule.forFeature([persona_entity_1.Persona, tipo_persona_entity_1.TipoPersona]),
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (configService) => ({

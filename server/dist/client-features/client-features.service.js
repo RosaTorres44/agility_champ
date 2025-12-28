@@ -54,6 +54,12 @@ let ClientFeaturesService = class ClientFeaturesService {
         }));
     }
     async addMyDog(data, userId, userName) {
+        if (data.id_raza)
+            data.id_raza = Number(data.id_raza);
+        if (data.id_grado_actual)
+            data.id_grado_actual = Number(data.id_grado_actual);
+        if (data.id_categoria_talla)
+            data.id_categoria_talla = Number(data.id_categoria_talla);
         const newPerro = await this.maintenanceService.create('perro', data, userId, userName);
         const duplaData = {
             id_perro: newPerro.id,

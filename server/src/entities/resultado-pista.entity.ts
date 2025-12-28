@@ -58,6 +58,9 @@ export class ResultadoPista {
     @Column({ default: false })
     es_eli: boolean;
 
+    @Column({ default: false })
+    es_ausente: boolean;
+
     @Column({ default: true })
     es_elegible_podio: boolean;
 

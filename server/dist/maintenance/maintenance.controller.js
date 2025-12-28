@@ -21,8 +21,13 @@ let MaintenanceController = class MaintenanceController {
     constructor(maintenanceService) {
         this.maintenanceService = maintenanceService;
     }
-    findAll(entity) {
-        return this.maintenanceService.findAll(entity);
+    async findAll(entity) {
+        console.log(`[MaintenanceController] findAll called for: ${entity}`);
+        const result = await this.maintenanceService.findAll(entity);
+        if (entity === 'pista') {
+            console.log(`[MaintenanceController] Returning ${result.length} pistas:`, JSON.stringify(result));
+        }
+        return result;
     }
     async create(entity, body, req) {
         try {
@@ -47,10 +52,11 @@ let MaintenanceController = class MaintenanceController {
 exports.MaintenanceController = MaintenanceController;
 __decorate([
     (0, common_1.Get)(':entity'),
+    (0, common_1.Get)(':entity'),
     __param(0, (0, common_1.Param)('entity')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], MaintenanceController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(':entity'),

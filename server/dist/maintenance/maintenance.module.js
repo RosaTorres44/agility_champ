@@ -25,6 +25,7 @@ const dupla_entity_1 = require("../entities/dupla.entity");
 const raza_entity_1 = require("../entities/raza.entity");
 const system_setting_entity_1 = require("../entities/system-setting.entity");
 const audit_module_1 = require("../audit/audit.module");
+const inscripcion_entity_1 = require("../entities/inscripcion.entity");
 let MaintenanceModule = class MaintenanceModule {
 };
 exports.MaintenanceModule = MaintenanceModule;
@@ -45,7 +46,8 @@ exports.MaintenanceModule = MaintenanceModule = __decorate([
                 pista_entity_1.Pista,
                 dupla_entity_1.Dupla,
                 raza_entity_1.Raza,
-                system_setting_entity_1.SystemSetting
+                system_setting_entity_1.SystemSetting,
+                inscripcion_entity_1.Inscripcion
             ])
         ],
         controllers: [maintenance_controller_1.MaintenanceController],

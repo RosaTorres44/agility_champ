@@ -1,23 +1,3 @@
-cd agility-champs/
-
-npm install  --force
-npm install mysql2  --force
-npm install axios  --force
-npm install next react react-dom  --force
-npm install lucide-react
-npm install clsx
-
-
-npm install -g @railway/cli
-railway login --browserless
-railway link
-railway connect
-
-SOURCE /Users/rosa/Proyectos/agilityweb/data/scripts/datatest.sql
-
-
-Si tu proyecto usa Next.js, puedes ejecutarlo con:
-
 npm run build
 npm run dev
 
@@ -27,7 +7,7 @@ Abre tu navegador en http://localhost:3000 para ver la aplicación en acción.
 
 git init
 
-git remote add origin https://github.com/RosaTorres44/agility.git
+git remote add origin https://github.com/RosaTorres44/agility_champ.git
 
 git add .
 git commit -m "Primera versión del proyecto"

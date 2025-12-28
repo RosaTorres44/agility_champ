@@ -1,215 +1,318 @@
--- Modelo de Base de Datos para Gestión de Competencias
+-- Script de Creación de Base de Datos (Schema)
+-- Generado basado en las Entidades de TypeORM (Actualizado)
 
-DROP TABLE IF EXISTS persona;
-CREATE TABLE `persona` (
-  `id_persona` int NOT NULL AUTO_INCREMENT,
-  `des_nombres` varchar(100) NOT NULL,
-  `des_apellidos` varchar(100) NOT NULL,
-  `fec_nacimiento` DATE,
-  `flg_sexo` tinyint(1),
-  `des_correo` varchar(255) NOT NULL,
-  `hash_password` varchar(255) NOT NULL,
-  `des_rol` enum('Usuario','Juez') NOT NULL,
-  `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_persona`),
-  UNIQUE KEY `des_correo` (`des_correo`)
-)  ;
+SET FOREIGN_KEY_CHECKS = 0;
 
+-- ----------------------------
+-- 1. Tablas Independientes (Maastros)
+-- ----------------------------
 
--- Tabla de razas
-DROP TABLE IF EXISTS raza;
+DROP TABLE IF EXISTS `system_settings`;
+
+CREATE TABLE `system_settings` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `key` varchar(255) NOT NULL,
+    `value` text NOT NULL,
+    `description` varchar(255) DEFAULT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_key` (`key`)
+);
+
+DROP TABLE IF EXISTS `tipo_persona`;
+
+CREATE TABLE `tipo_persona` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cod` varchar(255) NOT NULL,
+    `nombre` varchar(255) NOT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_cod` (`cod`)
+);
+
+DROP TABLE IF EXISTS `organizacion`;
+
+CREATE TABLE `organizacion` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `nombre` varchar(255) NOT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `grado`;
+
+CREATE TABLE `grado` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cod` varchar(255) NOT NULL,
+    `nombre` varchar(255) NOT NULL,
+    `orden` int NOT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_cod` (`cod`)
+);
+
+DROP TABLE IF EXISTS `categoria_talla`;
+
+CREATE TABLE `categoria_talla` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cod` varchar(255) NOT NULL,
+    `nombre` varchar(255) NOT NULL,
+    `orden` int DEFAULT '0',
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_cod` (`cod`)
+);
+
+DROP TABLE IF EXISTS `raza`;
+
 CREATE TABLE `raza` (
-  `id_raza` int NOT NULL AUTO_INCREMENT,
-  `des_raza` varchar(100) NOT NULL,
-  `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_raza`) 
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `descripcion` varchar(255) NOT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
 );
 
--- Tabla de Perros
-DROP TABLE IF EXISTS perro;
+DROP TABLE IF EXISTS `tipo_pista`;
+
+CREATE TABLE `tipo_pista` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cod` varchar(255) NOT NULL,
+    `nombre` varchar(255) NOT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_cod` (`cod`)
+);
+
+-- ----------------------------
+-- 2. Tablas Dependientes Nivel 1
+-- ----------------------------
+
+DROP TABLE IF EXISTS `persona`;
+
+CREATE TABLE `persona` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_tipo_persona` bigint NOT NULL,
+    `nombres` varchar(255) NOT NULL,
+    `apellidos` varchar(255) NOT NULL,
+    `email` varchar(255) DEFAULT NULL,
+    `telefono` varchar(255) DEFAULT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_email` (`email`),
+    KEY `fk_persona_tipo` (`id_tipo_persona`),
+    CONSTRAINT `fk_persona_tipo` FOREIGN KEY (`id_tipo_persona`) REFERENCES `tipo_persona` (`id`)
+);
+
+DROP TABLE IF EXISTS `competencia`;
+
+CREATE TABLE `competencia` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `nombre` varchar(255) NOT NULL,
+    `descripcion` text,
+    `fecha_inicio` date NOT NULL,
+    `flg_homologada` tinyint NOT NULL DEFAULT '1',
+    `numero` int DEFAULT NULL,
+    `anio` int DEFAULT NULL,
+    `id_organizacion` bigint DEFAULT NULL,
+    `id_juez` bigint DEFAULT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_competencia_org` (`id_organizacion`),
+    KEY `fk_competencia_juez` (`id_juez`),
+    CONSTRAINT `fk_competencia_org` FOREIGN KEY (`id_organizacion`) REFERENCES `organizacion` (`id`),
+    CONSTRAINT `fk_competencia_juez` FOREIGN KEY (`id_juez`) REFERENCES `persona` (`id`)
+);
+
+DROP TABLE IF EXISTS `perro`;
+
 CREATE TABLE `perro` (
-  `id_perro` int NOT NULL AUTO_INCREMENT,
-  `des_nombres` varchar(100) NOT NULL,
-  `fec_nacimiento` DATE,
-  `flg_sexo` tinyint(1),
-  `des_chip` INT NOT NULL,
-  `id_raza` INT NOT NULL,
-  `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id_perro`),
-  UNIQUE KEY `des_chip` (`des_chip`),
-  FOREIGN KEY (id_raza) REFERENCES raza(id_raza)
-);
-
-
--- Tabla de Escuelas
-DROP TABLE IF EXISTS escuela;
-CREATE TABLE escuela (
-   `id_escuela`  int NOT NULL AUTO_INCREMENT,
-   `des_escuela` varchar(100) NOT NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-   PRIMARY KEY (`id_escuela`)
-);
-
-
--- Tabla de Grados
-DROP TABLE IF EXISTS grado;
-CREATE TABLE grado (
-   `id_grado`  int NOT NULL AUTO_INCREMENT,
-   `des_grado` varchar(100) NOT NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_grado`)
-);
-
--- Tabla de Categorías
-DROP TABLE IF EXISTS categoria;
-CREATE TABLE categoria (
-   `id_categoria`  int NOT NULL AUTO_INCREMENT,
-   `des_categoria` varchar(100) NOT NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_categoria`)
-);
-
-
--- Tabla de Duplas
-DROP TABLE IF EXISTS dupla;
-CREATE TABLE dupla (
-   `id_dupla` int NOT NULL AUTO_INCREMENT,
-   `id_perro` INT NOT NULL,
-   `id_persona` INT NOT NULL,
-   `id_grado` INT NOT NULL,
-   `id_categoria` INT NOT NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `nombre` varchar(255) NOT NULL,
+    `fecha_nacimiento` date DEFAULT NULL,
+    `chip` varchar(255) DEFAULT NULL,
+    `id_categoria_talla` bigint NOT NULL,
+    `id_grado_actual` bigint NOT NULL,
+    `id_raza` bigint DEFAULT NULL,
+    `observaciones` varchar(255) DEFAULT NULL,
     `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_dupla`),
-    FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
-    FOREIGN KEY (id_persona) REFERENCES persona(id_persona),
-    FOREIGN KEY (id_grado) REFERENCES grado(id_grado) ,
-    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria) 
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_perro_categoria` (`id_categoria_talla`),
+    KEY `fk_perro_grado` (`id_grado_actual`),
+    KEY `fk_perro_raza` (`id_raza`),
+    CONSTRAINT `fk_perro_categoria` FOREIGN KEY (`id_categoria_talla`) REFERENCES `categoria_talla` (`id`),
+    CONSTRAINT `fk_perro_grado` FOREIGN KEY (`id_grado_actual`) REFERENCES `grado` (`id`),
+    CONSTRAINT `fk_perro_raza` FOREIGN KEY (`id_raza`) REFERENCES `raza` (`id`)
 );
 
+-- ----------------------------
+-- 3. Tablas Dependientes Nivel 2
+-- ----------------------------
 
--- Tabla de detalle perro escuela
-DROP TABLE IF EXISTS detalle_perro_escuela;
-CREATE TABLE detalle_perro_escuela (
-   `id_perro` INT NOT NULL,
-   `id_escuela` INT NOT NULL,
-    `fec_inicio` timestamp NULL,
-    `fec_fin` timestamp NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+DROP TABLE IF EXISTS `competencia_organizacion`;
+
+CREATE TABLE `competencia_organizacion` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_competencia` bigint NOT NULL,
+    `id_organizacion` bigint NOT NULL,
     `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_perro`, `id_escuela`),
-    FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
-    FOREIGN KEY (id_escuela) REFERENCES escuela(id_escuela) 
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_co_competencia` (`id_competencia`),
+    KEY `fk_co_organizacion` (`id_organizacion`),
+    CONSTRAINT `fk_co_competencia` FOREIGN KEY (`id_competencia`) REFERENCES `competencia` (`id`),
+    CONSTRAINT `fk_co_organizacion` FOREIGN KEY (`id_organizacion`) REFERENCES `organizacion` (`id`)
 );
 
--- Tabla de detalle perro grado
-DROP TABLE IF EXISTS detalle_perro_grado;
-CREATE TABLE detalle_perro_grado (
-   `id_perro` INT NOT NULL,
-   `id_grado` INT NOT NULL,
-    `fec_inicio` timestamp NULL,
-    `fec_fin` timestamp NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+DROP TABLE IF EXISTS `dupla`;
+
+CREATE TABLE `dupla` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_perro` bigint NOT NULL,
+    `id_guia_persona` bigint NOT NULL,
     `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_perro`, `id_grado`),
-    FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
-    FOREIGN KEY (id_grado) REFERENCES grado(id_grado) 
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_dupla_perro` (`id_perro`),
+    KEY `fk_dupla_guia` (`id_guia_persona`),
+    CONSTRAINT `fk_dupla_perro` FOREIGN KEY (`id_perro`) REFERENCES `perro` (`id`),
+    CONSTRAINT `fk_dupla_guia` FOREIGN KEY (`id_guia_persona`) REFERENCES `persona` (`id`)
 );
 
--- Tabla de detalle perro categoria
-DROP TABLE IF EXISTS detalle_perro_categoria;
-CREATE TABLE detalle_perro_categoria (
-   `id_perro` INT NOT NULL,
-   `id_categoria` INT NOT NULL,
-    `fec_inicio` timestamp NULL,
-    `fec_fin` timestamp NULL,
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+DROP TABLE IF EXISTS `pista`;
+
+CREATE TABLE `pista` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_competencia` bigint NOT NULL,
+    `id_tipo_pista` bigint NOT NULL,
+    `id_grado_base` bigint NOT NULL,
+    `id_juez_persona` bigint DEFAULT NULL,
+    `longitud_m` decimal(10, 2) DEFAULT NULL,
+    `obstaculos` int NOT NULL DEFAULT 15,
+    `velocidad_elegida_ms` decimal(10, 2) DEFAULT NULL,
+    `tsr_seg` decimal(10, 2) DEFAULT NULL,
+    `tmr_seg` decimal(10, 2) DEFAULT NULL,
+    `estado` enum(
+        'creada',
+        'armada',
+        'en_curso',
+        'finalizada'
+    ) DEFAULT 'creada',
+    `flg_perro_mas_rapido` tinyint(1) DEFAULT '0',
+    `modo_tsr` varchar(255) DEFAULT NULL,
+    `velocidad_nt_ms` decimal(10, 2) DEFAULT NULL,
+    `mejor_tiempo_ref_seg` decimal(10, 2) DEFAULT NULL,
+    `velocidad_calculada_ms` decimal(10, 2) DEFAULT NULL,
     `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_perro`, `id_categoria`),
-    FOREIGN KEY (id_perro) REFERENCES perro(id_perro),
-    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria) 
-);
-
--- Tabla de Competencias
-DROP TABLE IF EXISTS competencia;
-CREATE TABLE competencia (
-        `id_competencia` int NOT NULL AUTO_INCREMENT,
-        `des_competencia` varchar(100) NOT NULL,
-        `id_escuela` INT NOT NULL,
-        `fec_inicio` timestamp NOT NULL,
-        `fec_fin` timestamp NOT NULL,
-        `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-        `flg_activo` tinyint(1) DEFAULT '1', 
-         PRIMARY KEY (`id_competencia`),
-         FOREIGN KEY (id_escuela) REFERENCES escuela(id_escuela)
-);
-
-/*
-                  let status = "Pendiente";
-            switch (flg_activo) {
-            case 1:
-              status = "En Curso";
-              break;
-            case -1:
-              status = "Cerrada";
-              break;
-            case 0:
-              status = "Próxima";
-              break;
-            }
-*/
--- Tabla de Pistas
-DROP TABLE IF EXISTS pista;
-CREATE TABLE pista (
-    `id_pista` int NOT NULL AUTO_INCREMENT,
-    `des_pista` varchar(100) NOT NULL,
-    `id_competencia` INT NOT NULL,
-    `id_grado`  INT NOT NULL,
-    `id_categoria` INT NOT NULL,
-    `id_persona`  INT NOT NULL,
-    `num_obstaculos` INT NOT NULL,
-    `num_longitud` DECIMAL(5, 2) NOT NULL,
-    `num_velocidad_maxima` DECIMAL(5, 2) NOT NULL,
-    `num_velocidad_minima` DECIMAL(5, 2) NOT NULL,
-    `num_tiempo_maximo` DECIMAL(5, 2) NOT NULL,
-    `num_tiempo_minimo` DECIMAL(5, 2) NOT NULL,
-    `des_tipo` ENUM('Jumping', 'Agility') NOT NULL,
     `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-    `flg_activo` tinyint(1) DEFAULT '1', 
-    PRIMARY KEY (`id_pista`),
-    FOREIGN KEY (id_competencia) REFERENCES competencia(id_competencia),
-    FOREIGN KEY (id_grado) REFERENCES grado(id_grado),
-    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria),
-    FOREIGN KEY (id_persona) REFERENCES persona(id_persona)
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_pista_competencia` (`id_competencia`),
+    KEY `fk_pista_tipo` (`id_tipo_pista`),
+    KEY `fk_pista_grado` (`id_grado_base`),
+    KEY `fk_pista_juez` (`id_juez_persona`),
+    CONSTRAINT `fk_pista_competencia` FOREIGN KEY (`id_competencia`) REFERENCES `competencia` (`id`),
+    CONSTRAINT `fk_pista_tipo` FOREIGN KEY (`id_tipo_pista`) REFERENCES `tipo_pista` (`id`),
+    CONSTRAINT `fk_pista_grado` FOREIGN KEY (`id_grado_base`) REFERENCES `grado` (`id`),
+    CONSTRAINT `fk_pista_juez` FOREIGN KEY (`id_juez_persona`) REFERENCES `persona` (`id`)
 );
 
+-- ----------------------------
+-- 4. Tablas Operacionales (Inscripciones, Resultados, Ranking)
+-- ----------------------------
 
--- Tabla de resultados
-DROP TABLE IF EXISTS resultados;
-CREATE TABLE resultados (
-    `id_resultado` int NOT NULL AUTO_INCREMENT,
-    `id_pista`  INT NOT NULL,
-    `id_dupla` INT NOT NULL,  
-    `num_tiempo` DECIMAL(5, 2) NOT NULL,
-    `num_rehuse` INT NOT NULL,
-    `num_faltas` INT NOT NULL,
-    `num_posicion` INT NOT NULL,
-    `num_penalizacion_recorrido` INT NOT NULL,
-    `num_penalizacion_tiempo` INT NOT NULL,
-    `num_total_penalizaciones` INT NOT NULL,
-    `num_velocidad` DECIMAL(5, 2) NOT NULL,
-    `flg_medalla` tinyint(1), 
-    `flg_mejor_velocidad` tinyint(1), 
-    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+DROP TABLE IF EXISTS `inscripcion`;
+
+CREATE TABLE `inscripcion` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_pista` bigint NOT NULL,
+    `id_dupla` bigint NOT NULL,
     `flg_activo` tinyint(1) DEFAULT '1',
-    PRIMARY KEY (`id_resultado`),
-    FOREIGN KEY (id_pista) REFERENCES pista(id_pista),
-    FOREIGN KEY (id_dupla) REFERENCES dupla(id_dupla)
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_inscripcion_pista` (`id_pista`),
+    KEY `fk_inscripcion_dupla` (`id_dupla`),
+    CONSTRAINT `fk_inscripcion_pista` FOREIGN KEY (`id_pista`) REFERENCES `pista` (`id`),
+    CONSTRAINT `fk_inscripcion_dupla` FOREIGN KEY (`id_dupla`) REFERENCES `dupla` (`id`)
 );
- 
+
+DROP TABLE IF EXISTS `resultado_pista`;
+
+CREATE TABLE `resultado_pista` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `id_inscripcion` bigint DEFAULT NULL,
+    `id_pista` bigint NOT NULL,
+    `id_dupla` bigint NOT NULL,
+    `id_perro` bigint NOT NULL,
+    `categoria_competitiva` varchar(255) DEFAULT NULL,
+    `tiempo_cronometrado_seg` decimal(10, 2) DEFAULT NULL,
+    `faltas` int NOT NULL DEFAULT '0',
+    `rehuses` int NOT NULL DEFAULT '0',
+    `penalidad_total_seg` decimal(10, 2) DEFAULT '0.00',
+    `tiempo_total_seg` decimal(10, 2) DEFAULT '0.00',
+    `es_eli` tinyint(1) NOT NULL DEFAULT '0',
+    `es_elegible_podio` tinyint(1) NOT NULL DEFAULT '1',
+    `es_elegible_ranking` tinyint(1) NOT NULL DEFAULT '1',
+    `puesto` int DEFAULT NULL,
+    `puntos_ranking` int NOT NULL DEFAULT '0',
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_resultado_inscripcion` (`id_inscripcion`),
+    KEY `fk_resultado_pista` (`id_pista`),
+    KEY `fk_resultado_dupla` (`id_dupla`),
+    KEY `fk_resultado_perro` (`id_perro`),
+    CONSTRAINT `fk_resultado_inscripcion` FOREIGN KEY (`id_inscripcion`) REFERENCES `inscripcion` (`id`),
+    CONSTRAINT `fk_resultado_pista` FOREIGN KEY (`id_pista`) REFERENCES `pista` (`id`),
+    CONSTRAINT `fk_resultado_dupla` FOREIGN KEY (`id_dupla`) REFERENCES `dupla` (`id`),
+    CONSTRAINT `fk_resultado_perro` FOREIGN KEY (`id_perro`) REFERENCES `perro` (`id`)
+);
+
+DROP TABLE IF EXISTS `ranking_puntaje`;
+
+CREATE TABLE `ranking_puntaje` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `anio` int NOT NULL DEFAULT '2024',
+    `id_resultado_pista` bigint NOT NULL,
+    `id_dupla` bigint NOT NULL,
+    `puntos` int NOT NULL,
+    `motivo` varchar(255) DEFAULT NULL,
+    `flg_activo` tinyint(1) DEFAULT '1',
+    `fec_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `fec_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_ranking_composite` (
+        `anio`,
+        `id_dupla`,
+        `id_resultado_pista`
+    ),
+    KEY `fk_ranking_resultado` (`id_resultado_pista`),
+    KEY `fk_ranking_dupla` (`id_dupla`),
+    CONSTRAINT `fk_ranking_dupla` FOREIGN KEY (`id_dupla`) REFERENCES `dupla` (`id`),
+    CONSTRAINT `fk_ranking_resultado` FOREIGN KEY (`id_resultado_pista`) REFERENCES `resultado_pista` (`id`)
+);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+SELECT 'Base de datos generada correctamente.' as status;

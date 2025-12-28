@@ -32,6 +32,7 @@ export declare class ResultsService {
         penalidad_total_seg?: number | undefined;
         tiempo_total_seg?: number | undefined;
         es_eli?: boolean | undefined;
+        es_ausente?: boolean | undefined;
         es_elegible_podio?: boolean | undefined;
         es_elegible_ranking?: boolean | undefined;
         puesto?: number | undefined;

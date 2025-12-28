@@ -74,6 +74,7 @@ __decorate([
     __metadata("design:type", Date)
 ], RankingPuntaje.prototype, "fec_actualizacion", void 0);
 exports.RankingPuntaje = RankingPuntaje = __decorate([
-    (0, typeorm_1.Entity)('ranking_puntaje')
+    (0, typeorm_1.Entity)('ranking_puntaje'),
+    (0, typeorm_1.Unique)(['anio', 'id_dupla', 'id_resultado_pista'])
 ], RankingPuntaje);
 //# sourceMappingURL=ranking-puntaje.entity.js.map

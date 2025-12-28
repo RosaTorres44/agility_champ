@@ -6,8 +6,11 @@ export class ResultsController {
     constructor(private readonly resultsService: ResultsService) { }
 
     @Get('inscriptions/:trackId')
-    getInscriptions(@Param('trackId') trackId: string) {
-        return this.resultsService.getInscriptions(+trackId);
+    async getInscriptions(@Param('trackId') trackId: string) {
+        console.log(`[ResultsController] Fetching inscriptions for track: ${trackId}`);
+        const data = await this.resultsService.getInscriptions(+trackId);
+        console.log(`[ResultsController] Found ${data.length} inscriptions.`);
+        return data;
     }
 
     @Post('inscriptions')

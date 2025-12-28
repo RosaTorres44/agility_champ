@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Organizacion } from './organizacion.entity';
+import { Persona } from './persona.entity';
 
 @Entity('competencia')
 export class Competencia {
@@ -30,6 +31,13 @@ export class Competencia {
     @ManyToOne(() => Organizacion)
     @JoinColumn({ name: 'id_organizacion' })
     organizacion: Organizacion;
+
+    @Column({ type: 'bigint', nullable: true })
+    id_juez: number;
+
+    @ManyToOne(() => Persona)
+    @JoinColumn({ name: 'id_juez' })
+    juez: Persona;
 
     @Column({ default: true })
     flg_activo: boolean;

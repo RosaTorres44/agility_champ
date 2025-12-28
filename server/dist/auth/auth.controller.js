@@ -24,7 +24,7 @@ let AuthController = class AuthController {
     async googleAuth(req) { }
     async googleAuthRedirect(req, res) {
         const jwt = await this.authService.validateOAuthLogin(req.user);
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+        const clientUrl = process.env.CLIENT_URL;
         res.redirect(`${clientUrl}/login?token=${jwt}`);
     }
     async loginEmail(body) {

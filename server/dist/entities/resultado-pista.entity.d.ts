@@ -19,6 +19,7 @@ export declare class ResultadoPista {
     penalidad_total_seg: number;
     tiempo_total_seg: number;
     es_eli: boolean;
+    es_ausente: boolean;
     es_elegible_podio: boolean;
     es_elegible_ranking: boolean;
     puesto: number;

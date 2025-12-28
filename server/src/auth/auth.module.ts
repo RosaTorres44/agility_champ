@@ -7,13 +7,13 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { Persona } from '../entities/persona.entity';
-
+import { TipoPersona } from '../entities/tipo-persona.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     PassportModule,
-    TypeOrmModule.forFeature([Persona]),
+    TypeOrmModule.forFeature([Persona, TipoPersona]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

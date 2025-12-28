@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Competencia = void 0;
 const typeorm_1 = require("typeorm");
 const organizacion_entity_1 = require("./organizacion.entity");
+const persona_entity_1 = require("./persona.entity");
 let Competencia = class Competencia {
     id;
     nombre;
@@ -22,6 +23,8 @@ let Competencia = class Competencia {
     anio;
     id_organizacion;
     organizacion;
+    id_juez;
+    juez;
     flg_activo;
     fec_creacion;
     fec_actualizacion;
@@ -64,6 +67,15 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: 'id_organizacion' }),
     __metadata("design:type", organizacion_entity_1.Organizacion)
 ], Competencia.prototype, "organizacion", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'bigint', nullable: true }),
+    __metadata("design:type", Number)
+], Competencia.prototype, "id_juez", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => persona_entity_1.Persona),
+    (0, typeorm_1.JoinColumn)({ name: 'id_juez' }),
+    __metadata("design:type", persona_entity_1.Persona)
+], Competencia.prototype, "juez", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)

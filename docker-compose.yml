@@ -28,6 +28,8 @@ services:
       JWT_SECRET: super_secret_in_docker
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      CLIENT_URL: ${CLIENT_URL}
     depends_on:
       - db
 

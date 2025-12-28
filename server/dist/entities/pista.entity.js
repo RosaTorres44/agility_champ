@@ -26,6 +26,7 @@ let Pista = class Pista {
     id_juez_persona;
     juez;
     longitud_m;
+    obstaculos;
     velocidad_elegida_ms;
     tsr_seg;
     tmr_seg;
@@ -35,6 +36,7 @@ let Pista = class Pista {
     velocidad_nt_ms;
     mejor_tiempo_ref_seg;
     velocidad_calculada_ms;
+    descripcion;
     flg_activo;
     fec_creacion;
     fec_actualizacion;
@@ -85,6 +87,10 @@ __decorate([
     __metadata("design:type", Number)
 ], Pista.prototype, "longitud_m", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'int', default: 15 }),
+    __metadata("design:type", Number)
+], Pista.prototype, "obstaculos", void 0);
+__decorate([
     (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, nullable: true }),
     __metadata("design:type", Number)
 ], Pista.prototype, "velocidad_elegida_ms", void 0);
@@ -120,6 +126,10 @@ __decorate([
     (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, nullable: true }),
     __metadata("design:type", Number)
 ], Pista.prototype, "velocidad_calculada_ms", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Pista.prototype, "descripcion", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)

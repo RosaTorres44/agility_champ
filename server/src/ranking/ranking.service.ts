@@ -44,6 +44,15 @@ export class RankingService {
 
             log(`[RankingService] Track ${trackId} Type: ${trackType}, Grade: ${trackGrade}`);
 
+            // NEW RULE: Homologation
+            const isHomologada = results[0].pista.competencia?.flg_homologada;
+            log(`[RankingService] Competition Homologated: ${isHomologada}`);
+
+            if (!isHomologada) {
+                log(`[RankingService] Skipped: Competition is NOT homologated. Points removed.`);
+                return { message: 'Competition not homologated, points removed if any.' };
+            }
+
             // Rule: Only G2 and G3, and not Senior
             if (['G0', 'G1'].includes(trackGrade)) {
                 log(`[RankingService] Skipped: Grade ${trackGrade} not eligible`);
@@ -118,7 +127,7 @@ export class RankingService {
         try {
             console.log(`[RankingService] Calculating ranking (IGNORING YEAR)`);
 
-            // Full Query with Joins
+            // Use Raw Query for Window Function support
             const query = this.rankingRepo.createQueryBuilder('rp')
                 .leftJoinAndSelect('rp.dupla', 'd')
                 .leftJoinAndSelect('d.perro', 'p')
@@ -134,17 +143,23 @@ export class RankingService {
                     'ct.nombre AS categoria',
                     'gr.nombre AS grado',
                     'r.descripcion AS raza',
-                    'SUM(rp.puntos) AS puntos'
+                    'SUM(rp.puntos) AS puntos',
+                    'RANK() OVER (PARTITION BY p.id_grado_actual, p.id_categoria_talla ORDER BY SUM(rp.puntos) DESC) as puesto_calculado'
                 ])
                 .where('rp.anio = :year', { year })
-                .groupBy('rp.id_dupla')
+                .groupBy('rp.id_dupla') // Group by Dupla first
+                .addGroupBy('p.id') // Then Dog
                 .addGroupBy('p.nombre')
                 .addGroupBy('g.nombres')
                 .addGroupBy('g.apellidos')
                 .addGroupBy('ct.nombre')
                 .addGroupBy('gr.nombre')
                 .addGroupBy('r.descripcion')
-                .orderBy('puntos', 'DESC');
+                .addGroupBy('p.id_grado_actual') // Needed for Partition
+                .addGroupBy('p.id_categoria_talla') // Needed for Partition
+                .orderBy('grado', 'DESC') // Sort result list for readability
+                .addOrderBy('categoria', 'ASC')
+                .addOrderBy('puesto_calculado', 'ASC');
 
             if (gradeId) {
                 query.andWhere('p.id_grado_actual = :gradeId', { gradeId });
@@ -156,8 +171,8 @@ export class RankingService {
 
             const rawResults = await query.getRawMany();
 
-            return rawResults.map((r, index) => ({
-                puesto: index + 1,
+            return rawResults.map((r) => ({
+                puesto: Number(r.puesto_calculado),
                 dupla: `${r.perro} & ${r.guia_nombres} ${r.guia_apellidos}`,
                 categoria: `${r.categoria} - ${r.grado}`,
                 puntos: Number(r.puntos),

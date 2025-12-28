@@ -20,8 +20,11 @@ let ResultsController = class ResultsController {
     constructor(resultsService) {
         this.resultsService = resultsService;
     }
-    getInscriptions(trackId) {
-        return this.resultsService.getInscriptions(+trackId);
+    async getInscriptions(trackId) {
+        console.log(`[ResultsController] Fetching inscriptions for track: ${trackId}`);
+        const data = await this.resultsService.getInscriptions(+trackId);
+        console.log(`[ResultsController] Found ${data.length} inscriptions.`);
+        return data;
     }
     addInscription(body) {
         return this.resultsService.addInscription(body.trackId, body.duplaId);
@@ -42,7 +45,7 @@ __decorate([
     __param(0, (0, common_1.Param)('trackId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ResultsController.prototype, "getInscriptions", null);
 __decorate([
     (0, common_1.Post)('inscriptions'),

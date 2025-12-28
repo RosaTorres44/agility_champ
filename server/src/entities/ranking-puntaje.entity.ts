@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { ResultadoPista } from './resultado-pista.entity';
 import { Dupla } from './dupla.entity';
 
 @Entity('ranking_puntaje')
+@Unique(['anio', 'id_dupla', 'id_resultado_pista'])
 export class RankingPuntaje {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: number;

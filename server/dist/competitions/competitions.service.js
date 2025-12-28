@@ -34,7 +34,7 @@ let CompetitionsService = class CompetitionsService {
     async findOne(id) {
         return this.competenciaRepo.findOne({
             where: { id },
-            relations: ['competenciaFechas'],
+            relations: ['organizacion', 'juez'],
         });
     }
     async getTracksForCompetition(competitionId) {

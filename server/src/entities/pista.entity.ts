@@ -40,6 +40,9 @@ export class Pista {
     @Column('decimal', { precision: 10, scale: 2, nullable: true })
     longitud_m: number;
 
+    @Column({ type: 'int', default: 15 })
+    obstaculos: number;
+
     @Column('decimal', { precision: 10, scale: 2, nullable: true })
     velocidad_elegida_ms: number;
 
@@ -66,6 +69,9 @@ export class Pista {
 
     @Column('decimal', { precision: 10, scale: 2, nullable: true })
     velocidad_calculada_ms: number;
+
+    @Column({ nullable: true })
+    descripcion: string;
 
     @Column({ default: true })
     flg_activo: boolean;

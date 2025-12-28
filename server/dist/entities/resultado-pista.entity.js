@@ -32,6 +32,7 @@ let ResultadoPista = class ResultadoPista {
     penalidad_total_seg;
     tiempo_total_seg;
     es_eli;
+    es_ausente;
     es_elegible_podio;
     es_elegible_ranking;
     puesto;
@@ -109,6 +110,10 @@ __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], ResultadoPista.prototype, "es_eli", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], ResultadoPista.prototype, "es_ausente", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)

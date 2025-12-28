@@ -39,6 +39,11 @@ export class ClientFeaturesService {
     }
 
     async addMyDog(data: any, userId: number, userName: string) {
+        // Ensure IDs are numbers
+        if (data.id_raza) data.id_raza = Number(data.id_raza);
+        if (data.id_grado_actual) data.id_grado_actual = Number(data.id_grado_actual);
+        if (data.id_categoria_talla) data.id_categoria_talla = Number(data.id_categoria_talla);
+
         // 1. Create Perro using MaintenanceService to reuse logic
         const newPerro = await this.maintenanceService.create('perro', data, userId, userName);
 

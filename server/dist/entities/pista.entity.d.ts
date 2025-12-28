@@ -13,6 +13,7 @@ export declare class Pista {
     id_juez_persona: number;
     juez: Persona;
     longitud_m: number;
+    obstaculos: number;
     velocidad_elegida_ms: number;
     tsr_seg: number;
     tmr_seg: number;
@@ -22,6 +23,7 @@ export declare class Pista {
     velocidad_nt_ms: number;
     mejor_tiempo_ref_seg: number;
     velocidad_calculada_ms: number;
+    descripcion: string;
     flg_activo: boolean;
     fec_creacion: Date;
     fec_actualizacion: Date;

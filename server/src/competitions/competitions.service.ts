@@ -23,7 +23,7 @@ export class CompetitionsService {
     async findOne(id: number) {
         return this.competenciaRepo.findOne({
             where: { id },
-            relations: ['competenciaFechas'], // Relation name will depend on Entity definition, checking entities...
+            relations: ['organizacion', 'juez'],
         });
     }
 

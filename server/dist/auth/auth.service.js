@@ -18,22 +18,39 @@ const jwt_1 = require("@nestjs/jwt");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const persona_entity_1 = require("../entities/persona.entity");
+const tipo_persona_entity_1 = require("../entities/tipo-persona.entity");
 let AuthService = class AuthService {
     jwtService;
     personaRepo;
-    constructor(jwtService, personaRepo) {
+    tipoPersonaRepo;
+    constructor(jwtService, personaRepo, tipoPersonaRepo) {
         this.jwtService = jwtService;
         this.personaRepo = personaRepo;
+        this.tipoPersonaRepo = tipoPersonaRepo;
+        console.log(" [AuthService] INITIALIZED with Default Role Logic (GUIA check) v2");
+    }
+    async getDefaultRole() {
+        let role = await this.tipoPersonaRepo.findOne({ where: { cod: 'GUIA' } });
+        if (!role) {
+            role = await this.tipoPersonaRepo.findOne({ where: { nombre: (0, typeorm_2.Like)('%Guia%') } });
+        }
+        if (role) {
+            console.log(`[AuthService] Found role: ${role.nombre} (ID: ${role.id})`);
+            return role.id;
+        }
+        console.log(`[AuthService] Role 'GUIA' not found. Defaulting to ID 2.`);
+        return 2;
     }
     async validateOAuthLogin(profile) {
         let user = await this.personaRepo.findOne({ where: { email: profile.email } });
         if (!user) {
             console.log('User not found in DB', profile.email);
+            const defaultRoleId = await this.getDefaultRole();
             user = this.personaRepo.create({
                 nombres: profile.firstName,
                 apellidos: profile.lastName,
                 email: profile.email,
-                id_tipo_persona: 1,
+                id_tipo_persona: defaultRoleId,
                 flg_activo: true
             });
             await this.personaRepo.save(user);
@@ -69,9 +86,11 @@ let AuthService = class AuthService {
         if (user) {
             throw new Error('User already exists');
         }
+        const defaultRoleId = await this.getDefaultRole();
+        console.log(`[AuthService.register] Creating user ${data.email} with Role ID: ${defaultRoleId}`);
         user = this.personaRepo.create({
             ...data,
-            id_tipo_persona: 1,
+            id_tipo_persona: defaultRoleId,
             flg_activo: true
         });
         await this.personaRepo.save(user);
@@ -92,7 +111,9 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, typeorm_1.InjectRepository)(persona_entity_1.Persona)),
+    __param(2, (0, typeorm_1.InjectRepository)(tipo_persona_entity_1.TipoPersona)),
     __metadata("design:paramtypes", [jwt_1.JwtService,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

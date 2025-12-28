@@ -18,6 +18,7 @@ import { Dupla } from '../entities/dupla.entity';
 import { Raza } from '../entities/raza.entity';
 import { SystemSetting } from '../entities/system-setting.entity';
 import { AuditModule } from '../audit/audit.module';
+import { Inscripcion } from '../entities/inscripcion.entity'; // Added import
 
 @Module({
     imports: [
@@ -35,7 +36,8 @@ import { AuditModule } from '../audit/audit.module';
             Pista,
             Dupla,
             Raza,
-            SystemSetting
+            SystemSetting,
+            Inscripcion // Added
         ])
     ],
     controllers: [MaintenanceController],

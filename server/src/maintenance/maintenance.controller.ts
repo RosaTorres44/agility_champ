@@ -8,8 +8,14 @@ export class MaintenanceController {
     constructor(private readonly maintenanceService: MaintenanceService) { }
 
     @Get(':entity')
-    findAll(@Param('entity') entity: string) {
-        return this.maintenanceService.findAll(entity);
+    @Get(':entity')
+    async findAll(@Param('entity') entity: string) {
+        console.log(`[MaintenanceController] findAll called for: ${entity}`);
+        const result = await this.maintenanceService.findAll(entity);
+        if (entity === 'pista') {
+            console.log(`[MaintenanceController] Returning ${result.length} pistas:`, JSON.stringify(result));
+        }
+        return result;
     }
 
     @Post(':entity')

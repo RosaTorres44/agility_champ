@@ -121,6 +121,23 @@ export class MaintenanceService {
             return this.getRepo(entity).query(query);
         }
 
+        if (entity === 'inscripcion') {
+            const items = await this.getRepo(entity).find({
+                relations: ['pista', 'pista.competencia', 'dupla', 'dupla.perro', 'dupla.guia', 'dupla.perro.razas'], // Fetch full tree
+                order: { id: 'DESC' }
+            });
+
+            // Map to include flat fields for Admin display while keeping objects for Results page
+            return items.map((i: any) => ({
+                ...i,
+                competencia_nombre: i.pista?.competencia?.nombre,
+                pista_nombre: i.pista?.grado_nombre, // Or construct full name
+                guia_nombre: i.dupla?.guia?.nombre,
+                competencia: i.pista?.competencia, // Ensure nested exists
+                dupla: i.dupla // Ensure nested exists
+            }));
+        }
+
         // Default behavior for other entities
         return this.getRepo(entity).find({ order: { id: 'DESC' } });
     }

@@ -14,7 +14,7 @@ export class AuthController {
     @UseGuards(AuthGuard('google'))
     async googleAuthRedirect(@Req() req: any, @Res() res: any) {
         const jwt = await this.authService.validateOAuthLogin(req.user);
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+        const clientUrl = process.env.CLIENT_URL;
         res.redirect(`${clientUrl}/login?token=${jwt}`);
     }
 

@@ -132,6 +132,20 @@ let MaintenanceService = class MaintenanceService {
             `;
             return this.getRepo(entity).query(query);
         }
+        if (entity === 'inscripcion') {
+            const items = await this.getRepo(entity).find({
+                relations: ['pista', 'pista.competencia', 'dupla', 'dupla.perro', 'dupla.guia', 'dupla.perro.razas'],
+                order: { id: 'DESC' }
+            });
+            return items.map((i) => ({
+                ...i,
+                competencia_nombre: i.pista?.competencia?.nombre,
+                pista_nombre: i.pista?.grado_nombre,
+                guia_nombre: i.dupla?.guia?.nombre,
+                competencia: i.pista?.competencia,
+                dupla: i.dupla
+            }));
+        }
         return this.getRepo(entity).find({ order: { id: 'DESC' } });
     }
     async create(entity, data, userId, userName) {

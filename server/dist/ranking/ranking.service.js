@@ -47,6 +47,12 @@ let RankingService = class RankingService {
             const trackType = results[0].pista.tipoPista.cod;
             const trackGrade = results[0].pista.gradoBase.cod;
             log(`[RankingService] Track ${trackId} Type: ${trackType}, Grade: ${trackGrade}`);
+            const isHomologada = results[0].pista.competencia?.flg_homologada;
+            log(`[RankingService] Competition Homologated: ${isHomologada}`);
+            if (!isHomologada) {
+                log(`[RankingService] Skipped: Competition is NOT homologated. Points removed.`);
+                return { message: 'Competition not homologated, points removed if any.' };
+            }
             if (['G0', 'G1'].includes(trackGrade)) {
                 log(`[RankingService] Skipped: Grade ${trackGrade} not eligible`);
                 return { message: 'Grade not eligible for National Ranking' };
@@ -119,17 +125,23 @@ let RankingService = class RankingService {
                 'ct.nombre AS categoria',
                 'gr.nombre AS grado',
                 'r.descripcion AS raza',
-                'SUM(rp.puntos) AS puntos'
+                'SUM(rp.puntos) AS puntos',
+                'RANK() OVER (PARTITION BY p.id_grado_actual, p.id_categoria_talla ORDER BY SUM(rp.puntos) DESC) as puesto_calculado'
             ])
                 .where('rp.anio = :year', { year })
                 .groupBy('rp.id_dupla')
+                .addGroupBy('p.id')
                 .addGroupBy('p.nombre')
                 .addGroupBy('g.nombres')
                 .addGroupBy('g.apellidos')
                 .addGroupBy('ct.nombre')
                 .addGroupBy('gr.nombre')
                 .addGroupBy('r.descripcion')
-                .orderBy('puntos', 'DESC');
+                .addGroupBy('p.id_grado_actual')
+                .addGroupBy('p.id_categoria_talla')
+                .orderBy('grado', 'DESC')
+                .addOrderBy('categoria', 'ASC')
+                .addOrderBy('puesto_calculado', 'ASC');
             if (gradeId) {
                 query.andWhere('p.id_grado_actual = :gradeId', { gradeId });
             }
@@ -137,8 +149,8 @@ let RankingService = class RankingService {
                 query.andWhere('p.id_categoria_talla = :categoryId', { categoryId });
             }
             const rawResults = await query.getRawMany();
-            return rawResults.map((r, index) => ({
-                puesto: index + 1,
+            return rawResults.map((r) => ({
+                puesto: Number(r.puesto_calculado),
                 dupla: `${r.perro} & ${r.guia_nombres} ${r.guia_apellidos}`,
                 categoria: `${r.categoria} - ${r.grado}`,
                 puntos: Number(r.puntos),
